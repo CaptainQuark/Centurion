@@ -1,35 +1,32 @@
 package factory;
 
-import enumerations.HeroTypes;
+import enumerations.HeroType;
 import mapper.HeroTypeMapper;
-import model.AbstractCreature;
 import model.Hero;
 
 /**
  * @author Thomas Schönmann
  * @version %I%
  */
-public class HeroFactory extends AbstractCreatureFactory {
+public class HeroFactory implements CreatureFactory<Hero> {
 
-    /**
-     * Encapsulated method to map a request <tt>Hero</tt>
-     *  to a produced object.
-     *
-     * @param e   The type of  <tt>AbstractCreature</tt> requested.
-     * @return      The produced <tt>Hero</tt>.
-     */
-    @Override
-    protected <E extends Enum> AbstractCreature produce(E e) {
-        return new HeroTypeMapper().map(e);
+    private static HeroFactory instance;
+
+    private HeroFactory(){}
+
+    public static HeroFactory getInstance(){
+        return instance == null ? instance = new HeroFactory() : instance;
     }
 
     /**
-     * API to create a <tt>Hero</tt>.
+     * Encapsulated method to map a request <tt>Hero</tt>
+     * to a produced object.
      *
-     * @param type  The type of Hero requested.
-     * @return      <tt>Hero</tt> object.
+     * @param e The type of  <tt>AbstractCreature</tt> requested.
+     * @return The produced <tt>Hero</tt>.
      */
-    public static Hero get(HeroTypes type){
-        return (Hero) new HeroFactory().produce(type);
+    @Override
+    public <E extends Enum> Hero produce( E e) {
+        return new HeroTypeMapper().map(e);
     }
 }

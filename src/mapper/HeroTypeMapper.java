@@ -1,6 +1,6 @@
 package mapper;
 
-import enumerations.HeroTypes;
+import enumerations.HeroType;
 import manager.CombatManager;
 import model.Hero;
 
@@ -16,7 +16,7 @@ public class HeroTypeMapper extends AbstractMapper<Hero> {
     public  <E extends Enum> Hero map(E e) {
 
         // Cast 'e' to HeroType to access HeroType's elements.
-        HeroTypes types = (HeroTypes) e;
+        HeroType types = (HeroType) e;
 
         switch (types) {
 

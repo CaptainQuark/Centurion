@@ -6,6 +6,6 @@ package enumerations;
  * @author Thomas Schönmann
  * @version %I%
  */
-public enum HeroTypes {
+public enum HeroType {
     DEBUG_HERO
 }

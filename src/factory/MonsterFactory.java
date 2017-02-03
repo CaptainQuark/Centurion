@@ -1,6 +1,5 @@
 package factory;
 
-import enumerations.MonsterType;
 import mapper.MonsterTypeMapper;
 import model.AbstractCreature;
 import model.Monster;
@@ -9,20 +8,18 @@ import model.Monster;
  * @author Thomas Schönmann
  * @version %I%
  */
-public class MonsterFactory extends AbstractCreatureFactory {
+public class MonsterFactory implements CreatureFactory {
 
-    @Override
-    protected <E extends Enum> AbstractCreature produce(E e) {
-        return new MonsterTypeMapper().map(e);
+    private static MonsterFactory instance;
+
+    private MonsterFactory() {}
+
+    public static MonsterFactory getInstance() {
+        return instance == null ? instance = new MonsterFactory() : instance;
     }
 
-    /**
-     * API to create a <tt>Hero</tt>.
-     *
-     * @param type The type of Hero requested.
-     * @return <tt>Hero</tt> object.
-     */
-    public static Monster get(MonsterType type) {
-        return (Monster) new MonsterFactory().produce(type);
+    @Override
+    public Monster produce(Enum e) {
+        return new MonsterTypeMapper().map(e);
     }
 }

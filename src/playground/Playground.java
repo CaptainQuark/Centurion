@@ -1,6 +1,6 @@
 package playground;
 
-import enumerations.HeroTypes;
+import enumerations.HeroType;
 import enumerations.MonsterType;
 import factory.HeroFactory;
 import factory.MonsterFactory;
@@ -18,8 +18,8 @@ public class Playground {
         // '.start()' currently has no effect.
 
         CombatManager.getInstance()
-                .setHero(HeroFactory.get(HeroTypes.DEBUG_HERO))
-                .setMonster(MonsterFactory.get(MonsterType.DEBUG_MONSTER))
+                .setHero(HeroFactory.getInstance().produce(HeroType.DEBUG_HERO))
+                .setMonster(MonsterFactory.getInstance().produce(MonsterType.DEBUG_MONSTER))
                 .start();
 
         InputSimulator input = new InputSimulator();
