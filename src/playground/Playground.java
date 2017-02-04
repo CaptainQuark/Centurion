@@ -6,6 +6,7 @@ import factory.HeroFactory;
 import factory.MonsterFactory;
 import input.InputSimulator;
 import manager.CombatManager;
+import manager.CombatStateManager;
 
 /**
  * @author Thomas Schönmann
@@ -17,14 +18,20 @@ public class Playground {
 
         // '.start()' currently has no effect.
 
-        CombatManager.getInstance()
+        CombatManager combatManager = new CombatManager()
                 .setHero(HeroFactory.getInstance().produce(HeroType.DEBUG_HERO))
-                .setMonster(MonsterFactory.getInstance().produce(MonsterType.DEBUG_MONSTER))
-                .start();
+                .setMonster(MonsterFactory.getInstance().produce(MonsterType.DEBUG_MONSTER));
 
         InputSimulator input = new InputSimulator();
 
-        input.addObserver(CombatManager.getInstance());
+        // Set the initial state.
+        CombatStateManager combatStateManager = new CombatStateManager(combatManager);
+
+        // Tell the CombatManager that someone (= StateManager) wants to observe him.
+        combatStateManager.peek().setStateManagerObserver(combatStateManager);
+
+        // Register CombatManager as observer for inputs.
+        input.addObserver(combatStateManager.peek());
 
         // Simulate some throws by the user.
 
@@ -40,6 +47,6 @@ public class Playground {
         input.addThrow(120);
         System.out.println();
 
-        CombatManager.terminate();
+        System.out.println("Number of states: " + combatStateManager.getNumOfStates());
     }
 }

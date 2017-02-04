@@ -26,7 +26,7 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
             case DEBUG_MONSTER:
                 return (Monster) new Monster("Dummy Monster", 200, 25, 10, Biome.DEBUG_BIOME)
                         .addAbility((CombatManager c) -> {
-                            if (c.lastNumberThrownByUser > 100)
+                            if (c.getLastNumberThrownByUser() > 100)
                                 System.out.println("More than a 100 has been thrown - what a mighty shot!");
                         });
 

@@ -2,6 +2,7 @@ package manager;
 
 import model.Hero;
 import model.Monster;
+
 import java.util.Observable;
 import java.util.Observer;
 
@@ -11,21 +12,18 @@ import java.util.Observer;
  * @author Thomas Schönmann
  * @version %I%
  */
-public final class CombatManager extends Observable implements Observer {
+public final class CombatManager extends Observable implements Observer, Cloneable {
 
-    // TODO Delete after initial successful debugging.
-    public Integer lastNumberThrownByUser = -1;
+    private int lastNumberThrownByUser;
+    private int lastNumberThrownByMonster;
     private Hero hero;
     private Monster monster;
-
-    /**
-     * Single used instance of CombatManager. There will only
-     *  be one combat at the time.
-     */
-    private static CombatManager instance;
+    private LastCreatureProcessed lastCreatureProcessed;
 
     // TODO Consider changing to take arguments (hero, monster).
-    private CombatManager(){}
+    public CombatManager(){
+        lastCreatureProcessed = new LastCreatureProcessed();
+    }
 
     /**
      * Really necessary? CombatManager already listens to user input by itself.
@@ -34,21 +32,12 @@ public final class CombatManager extends Observable implements Observer {
         // Add requiered logic.
     }
 
-    /**
-     * Really useful?
-     *
-     * <a href="http://stackoverflow.com/questions/5342357/ever-need-to-destroy-a-singleton-instance"></a>
-     */
-    public static void terminate(){
-        instance = null;
-    }
-
     // Observer-method. Listens to input from user.
     @Override
     public void update(Observable o, Object arg) {
         if(arg instanceof Integer){
-            System.out.println("The user has hit a number, Combat has been notified.");
-            this.lastNumberThrownByUser = (Integer) arg;
+            System.out.println("The user has hit the field " + arg +", Combat has been notified.");
+            this.setLastNumberThrownByUser((Integer) arg);
         }
 
         tellObservers();
@@ -60,14 +49,16 @@ public final class CombatManager extends Observable implements Observer {
     private void tellObservers(){
         setChanged();
         notifyObservers(this);
+
+        this.lastCreatureProcessed.tell();
     }
 
-    public static void deleteAllObservers(){
-        instance.deleteObservers();
+    public void deleteAllObservers(){
+        this.deleteObservers();
     }
 
-    public static void deleteSpecificObserver(Observer o){
-        instance.deleteObserver(o);
+    public void deleteSpecificObserver(Observer o){
+        this.deleteObserver(o);
     }
 
     /*
@@ -75,29 +66,62 @@ public final class CombatManager extends Observable implements Observer {
      */
 
     public CombatManager setHero(Hero h){
-        instance.addObserver(hero = h);
-        return instance;
+        this.hero = h;
+        //instance.addObserver(h);
+        //return instance;
+        this.addObserver(h);
+        return this;
     }
 
     public CombatManager setMonster(Monster m){
-        instance.addObserver(monster = m);
-        return instance;
+        this.monster = m;
+        //instance.addObserver(m);
+        //return instance;
+        this.addObserver(m);
+        return this;
     }
 
-    public Hero getHero(){
-        return this.hero;
+    public CombatManager setStateManagerObserver(StateManager s){
+        lastCreatureProcessed.addObserver(s);
+        return this;
     }
 
-    public Monster getMonster(){
+    public int getLastNumberThrownByUser() {
+        return lastNumberThrownByUser;
+    }
+
+    public void setLastNumberThrownByUser(int lastNumberThrownByUser) {
+        this.lastNumberThrownByUser = lastNumberThrownByUser;
+    }
+
+    public Hero getHero() {
+        return hero;
+    }
+
+    public Monster getMonster() {
         return monster;
     }
 
-    /**
-     * <tt>CombatManger</tt>'s interface to get its instance.
-     *
-     * @return  Instance of <tt>CombatManger</tt>.
-     */
-    public static CombatManager getInstance(){
-        return instance == null ? instance = new CombatManager() : instance;
+    public int getLastNumberThrownByMonster(){
+        return lastNumberThrownByMonster;
+    }
+
+    public void setLastNumberThrownByMonster(int i){
+        lastNumberThrownByMonster = i;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    class LastCreatureProcessed extends Observable {
+
+        LastCreatureProcessed(){}
+
+        private void tell(){
+            setChanged();
+            notifyObservers(this);
+        }
     }
 }
