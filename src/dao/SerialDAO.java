@@ -1,6 +1,7 @@
 package dao;
 
 import helper.AbstractPathHelper;
+import helper.StandardPathHelper;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class SerialDAO implements DAO{
      * @return	The file found at the path.
      */
     private <T> File getFileByType(Class<T> t){
-        return new File(AbstractPathHelper.getRootPathAndAppendFileEnding(t.getSimpleName()));
+        return new File(StandardPathHelper.getInstance().getRootPathAndAppendFileEnding(t.getSimpleName()));
     }
 
     @SuppressWarnings("unchecked")

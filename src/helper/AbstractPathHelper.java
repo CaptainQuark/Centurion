@@ -26,18 +26,8 @@ public abstract class AbstractPathHelper {
      *
      * @return  The root path.
      */
-    private static String getRootPath(){
+    public String getRootPath(){
         return pathToRoot;
-    }
-
-    /**
-     * Get the path to a specific save file with its '.'-ending.
-     *
-     * @param fileName	The file's name without the '.'-ending.
-     * @return			Complete path to file.
-     */
-    public static String getRootPathAndAppendFileEnding(String fileName){
-        return getRootPath() + File.separator + fileName + fileSuffix;
     }
 
     /**
@@ -53,7 +43,7 @@ public abstract class AbstractPathHelper {
      *
      * @return Boolean if paths exist or not.
      */
-    private static boolean doesRootPathExist(){
+    private boolean doesRootPathExist(){
         if(pathToRoot.equals("")){
             System.out.println("Path isn't known yet.");
             return false;
@@ -68,10 +58,20 @@ public abstract class AbstractPathHelper {
      *
      * @param t	Variable to enable path-setting at runtime.
      */
-    public <T> void checkAndCreate(T t){
+    <T> void checkAndCreate(T t){
         if(!doesRootPathExist()){
             setEveryPathForSaveFiles(t);
             System.out.println("Every path is now registered @ " + pathToRoot);
         }
+    }
+
+    /**
+     * Get the path to a specific save file with its '.'-ending.
+     *
+     * @param fileName	The file's name without the '.'-ending.
+     * @return			Complete path to file.
+     */
+    public String getRootPathAndAppendFileEnding(String fileName){
+        return getRootPath() + File.separator + fileName + fileSuffix;
     }
 }
