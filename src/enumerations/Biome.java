@@ -5,5 +5,5 @@ package enumerations;
  * @version %I%
  */
 public enum Biome {
-    DEBUG_BIOME,
+    Forest,
 }

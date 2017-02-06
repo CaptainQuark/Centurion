@@ -5,9 +5,9 @@ package enumerations;
  * @version %I%
  */
 public enum MonsterDifficulty {
-    EASY,
-    MEDIUM,
-    STRONG,
-    INSANE,
-    YOU_NUTS_MR_SIR,
+    Easy,
+    Medium,
+    Strong,
+    Insane,
+    You_nuts_Mr_Sir,
 }

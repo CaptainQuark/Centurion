@@ -1,6 +1,6 @@
 package generator;
 
-import enumerations.HeroTableColumnNames;
+import enumerations.HeroValues;
 import helper.ODSFileHelper;
 import org.jdom2.IllegalDataException;
 
@@ -28,13 +28,12 @@ public class HeroGenerator {
     public HeroGenerator(ArrayList<HashMap<String, ArrayList<String>>> table) {
         ArrayList<String> columnTitles = new ArrayList<>();
 
-        // Get set of column names according to the HeroTableColumnNames-enum.
-        for (int i = 0; i < HeroTableColumnNames.values().length; i++)
-            columnTitles.add(HeroTableColumnNames.values()[i].toString());
+        // Get set of column names according to the HeroValues-enum.
+        for (int i = 0; i < HeroValues.values().length; i++)
+            columnTitles.add(HeroValues.values()[i].toString());
 
         // Check if those names are different from the ones in the file. If so, throw an exception.
-        for (String s : ODSFileHelper.extractColumnTitles(table))
-            if (!columnTitles.contains(s))
+        if(!ODSFileHelper.doColumnTitlesExist(columnTitles, table))
                 throw new IllegalDataException("Table's column-titles are different from what they should be.");
 
         this.table = table;
@@ -62,9 +61,9 @@ public class HeroGenerator {
      * @return A selected faction.
      */
     public String getFaction(final String validBiome, final String category) {
-        ArrayList<String> categories = ODSFileHelper.extractColumn(table, HeroTableColumnNames.CATEGORY.name());
-        ArrayList<Integer> rarities = ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroTableColumnNames.RARITY.name()));
-        ArrayList<String> restrictedBiomes = ODSFileHelper.extractColumn(table, HeroTableColumnNames.RESTRICTED_BIOME.name());
+        ArrayList<String> categories = ODSFileHelper.extractColumn(table, HeroValues.CATEGORY.name());
+        ArrayList<Integer> rarities = ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.RARITY.name()));
+        ArrayList<String> restrictedBiomes = ODSFileHelper.extractColumn(table, HeroValues.RESTRICTED_BIOME.name());
 
         if (categories == null || rarities == null || restrictedBiomes == null)
             throw new NullPointerException("Some data couldn't be read from the table, at least one column doesn't contain any.");
@@ -100,8 +99,8 @@ public class HeroGenerator {
                 throw new IllegalArgumentException("Wrong category name provided.");
         }
 
-        return ODSFileHelper.extractColumn(table, HeroTableColumnNames.FACTION.name()) != null
-                ? ODSFileHelper.extractColumn(table, HeroTableColumnNames.FACTION.name()).get(index) : null;
+        return ODSFileHelper.extractColumn(table, HeroValues.FACTION.name()) != null
+                ? ODSFileHelper.extractColumn(table, HeroValues.FACTION.name()).get(index) : null;
     }
 
     /**
@@ -111,10 +110,10 @@ public class HeroGenerator {
      */
     public int getHitpoints() {
         return generateRandomVal(
-                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroTableColumnNames.HP.name())).get(primaryIndex),
-                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroTableColumnNames.HP.name())).get(secondaryIndex),
-                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroTableColumnNames.HP_WEIGHT.name())).get(primaryIndex),
-                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroTableColumnNames.HP_WEIGHT.name())).get(secondaryIndex));
+                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.HP.name())).get(primaryIndex),
+                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.HP.name())).get(secondaryIndex),
+                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroValues.HP_WEIGHT.name())).get(primaryIndex),
+                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroValues.HP_WEIGHT.name())).get(secondaryIndex));
     }
 
     /**
@@ -124,10 +123,10 @@ public class HeroGenerator {
      */
     public int getPurchaseCosts() {
         return generateRandomVal(
-                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroTableColumnNames.COSTS.name())).get(primaryIndex),
-                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroTableColumnNames.COSTS.name())).get(secondaryIndex),
-                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroTableColumnNames.COSTS_WEIGHT.name())).get(primaryIndex),
-                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroTableColumnNames.COSTS_WEIGHT.name())).get(secondaryIndex));
+                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.COSTS.name())).get(primaryIndex),
+                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.COSTS.name())).get(secondaryIndex),
+                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroValues.COSTS_WEIGHT.name())).get(primaryIndex),
+                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroValues.COSTS_WEIGHT.name())).get(secondaryIndex));
     }
 
     /**
@@ -137,10 +136,10 @@ public class HeroGenerator {
      */
     public int getEvasion() {
         return generateRandomVal(
-                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroTableColumnNames.EVASION.name())).get(primaryIndex),
-                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroTableColumnNames.EVASION.name())).get(secondaryIndex),
-                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroTableColumnNames.EVASION_WEIGHT.name())).get(primaryIndex),
-                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroTableColumnNames.EVASION_WEIGHT.name())).get(secondaryIndex));
+                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.EVASION.name())).get(primaryIndex),
+                ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.EVASION.name())).get(secondaryIndex),
+                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroValues.EVASION_WEIGHT.name())).get(primaryIndex),
+                ODSFileHelper.castToDouble(ODSFileHelper.extractColumn(table, HeroValues.EVASION_WEIGHT.name())).get(secondaryIndex));
     }
 
     /**

@@ -110,4 +110,12 @@ public class ODSFileHelper {
 
         return cleanCells;
     }
+
+    public static boolean doColumnTitlesExist(ArrayList<String> titles, ArrayList<HashMap<String, ArrayList<String>>> table) {
+        for (String s : ODSFileHelper.extractColumnTitles(table))
+            if (!titles.contains(s))
+                return false;
+
+        return true;
+    }
 }

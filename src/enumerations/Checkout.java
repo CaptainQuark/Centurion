@@ -5,5 +5,7 @@ package enumerations;
  * @version %I%
  */
 public enum  Checkout {
-    MASTER
+    DEFAULT,
+    MASTER,
+    DOUBLE
 }

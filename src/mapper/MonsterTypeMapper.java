@@ -1,7 +1,7 @@
 package mapper;
 
-import enumerations.Biome;
-import enumerations.MonsterType;
+import enumerations.*;
+import generator.MonsterGenerator;
 import helper.ODSFileHelper;
 import helper.Preference;
 import helper.StandardPathHelper;
@@ -25,15 +25,33 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
 
     @Override
     public <E extends Enum> Monster map(E e) {
-        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.HERO_DATA_FILE);
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.MONSTER_DATA_FILE);
         ArrayList<HashMap<String, ArrayList<String>>> table = ODSFileHelper.readODSAtTab(f, 0);
+        MonsterGenerator g;
 
         // Cast 'e' to MonsterType to access its elements.
         MonsterType type = (MonsterType) e;
 
+
         switch (type) {
             case DEBUG_MONSTER:
-                return (Monster) new Monster("Dummy Monster", 200, 25, 10, Biome.DEBUG_BIOME)
+                g = new MonsterGenerator(table, Biome.Forest, MonsterDifficulty.Easy);
+
+                return (Monster) new Monster(g.getValAsString(MonsterValues.NAME),
+                        g.getValAsString(MonsterValues.TYPE),
+                        g.getValAsInt(MonsterValues.HP),
+                        25,
+                        g.getValAsInt(MonsterValues.EVASION),
+                        Biome.Forest,
+                        Checkout.DEFAULT, MonsterDifficulty.Medium,
+                        g.getValAsDouble(MonsterValues.RESISTANCE),
+                        g.getValAsDouble(MonsterValues.CRIT_MULITPLIER),
+                        g.getValAsInt(MonsterValues.DMG_MIN),
+                        g.getValAsInt(MonsterValues.DMG_MAX),
+                        g.getValAsInt(MonsterValues.BLOCK),
+                        g.getValAsInt(MonsterValues.CRIT_CHANCE),
+                        g.getValAsInt(MonsterValues.BOUNTY),
+                        g.getValAsInt(MonsterValues.ACCURACY))
                         .addAbility((CombatManager c) -> {
                             if (c.getLastNumberThrownByUser() > 100)
                                 System.out.println("More than a 100 has been thrown - what a mighty shot!");

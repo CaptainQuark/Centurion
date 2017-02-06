@@ -4,7 +4,7 @@ package enumerations;
  * @author Thomas Schönmann
  * @version %I%
  */
-public enum HeroTableColumnNames {
+public enum HeroValues {
     ID,
     CATEGORY,
     FACTION,
