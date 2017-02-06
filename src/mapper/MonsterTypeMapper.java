@@ -2,8 +2,15 @@ package mapper;
 
 import enumerations.Biome;
 import enumerations.MonsterType;
+import helper.ODSFileHelper;
+import helper.Preference;
+import helper.StandardPathHelper;
 import manager.CombatManager;
 import model.Monster;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Outsources the mapping process to make classes
@@ -18,6 +25,8 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
 
     @Override
     public <E extends Enum> Monster map(E e) {
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.HERO_DATA_FILE);
+        ArrayList<HashMap<String, ArrayList<String>>> table = ODSFileHelper.readODSAtTab(f, 0);
 
         // Cast 'e' to MonsterType to access its elements.
         MonsterType type = (MonsterType) e;

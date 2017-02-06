@@ -1,8 +1,8 @@
 package playground;
 
-import helper.ODSFileReader;
+import helper.ODSFileHelper;
+import helper.Preference;
 import helper.StandardPathHelper;
-import helper.TableHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,10 +15,10 @@ public class ODSFileReadSample {
 
     public static void main(String...args){
 
-        File f = new File(StandardPathHelper.getInstance().getDataPath() + "sample.ods");
-        TableHelper<String> entries = new TableHelper<>();
-        ArrayList<String> names = entries.extractColumn(ODSFileReader.readODSAtTab(f, 0), "ID");
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.HERO_DATA_FILE);
+        //ArrayList<String> values = ODSFileHelper.extractColumn(ODSFileHelper.readODSAtTab(f, 0), "FACTION");
+        ArrayList<String> values = ODSFileHelper.extractColumnTitles(ODSFileHelper.readODSAtTab(f, 0));
 
-        names.forEach(System.out::println);
+        values.forEach(System.out::println);
     }
 }

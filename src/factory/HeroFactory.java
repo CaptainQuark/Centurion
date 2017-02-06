@@ -1,10 +1,11 @@
 package factory;
 
-import enumerations.HeroType;
 import mapper.HeroTypeMapper;
 import model.Hero;
 
 /**
+ * Factory for producing <tt>Hero</tt>-objects.
+ *
  * @author Thomas Schönmann
  * @version %I%
  */
@@ -26,7 +27,7 @@ public class HeroFactory implements CreatureFactory<Hero> {
      * @return The produced <tt>Hero</tt>.
      */
     @Override
-    public <E extends Enum> Hero produce( E e) {
+    public <E extends Enum> Hero produce(E e) {
         return new HeroTypeMapper().map(e);
     }
 }

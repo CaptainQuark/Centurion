@@ -1,4 +1,4 @@
-package id;
+package generator;
 
 import java.util.List;
 
