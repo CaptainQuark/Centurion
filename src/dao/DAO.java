@@ -1,5 +1,6 @@
 package dao;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * @version %I%
  * @author Thomas Schönmann
  */
-public interface DAO {
+public interface DAO extends Serializable{
 
     /**
      * Retrieve every element of the class provided.

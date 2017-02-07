@@ -1,7 +1,5 @@
 package model;
 
-import model.AbstractCreature;
-
 /**
  * Every creature the user can control.
  *
@@ -37,5 +35,14 @@ public class Hero extends AbstractCreature {
 
     public String getSecondaryFaction(){
         return this.secondaryFaction;
+    }
+
+    @Override
+    public String toString(){
+        String n = System.getProperty("line.separator");
+        return super.toString()
+                + "Purchase costs: " + purchaseCosts + n
+                + "1. Faction: " + primaryFaction + n
+                + "2. Faction: " + secondaryFaction + n;
     }
 }

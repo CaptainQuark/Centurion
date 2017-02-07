@@ -87,4 +87,22 @@ public class Monster extends AbstractCreature {
     }
 
     public String getType(){ return type; }
+
+    @Override
+    public String toString(){
+        String n = System.getProperty("line.separator");
+        return super.toString()
+                + "Type: " + type + n
+                + "Biome: " + biome.name() + n
+                + "Checkout: " + checkout.name() + n
+                + "Difficulty: " + difficulty.name() + n
+                + "Resistance: " + resistance + n
+                + "Crit multiplier: " + critMultiplier + n
+                + "Crit chance: " + critChance + n
+                + "Damage min: " + minDmg + n
+                + "Damage max: " + maxDmg + n
+                + "Block: " + block + n
+                + "Bounty: " + bounty + n
+                + "Accuracy: " + accuracy + n;
+    }
 }

@@ -1,6 +1,8 @@
 package model;
 
 import manager.CombatManager;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -12,12 +14,13 @@ import java.util.Observer;
  * @author Thomas Schönmann
  * @version %I%
  */
-public abstract class AbstractCreature implements Observer {
+public abstract class AbstractCreature implements Observer, Serializable {
 
     private final String name;
     private final int hpTotal;
     private final int bonusNumber;
-    private int hp, evasion;
+    private final int evasion;
+    private int hp;
     private ArrayList<Ability> abilities;
 
     AbstractCreature(String name, int hpTotal, int bonusNumber, int evasion){
@@ -36,7 +39,7 @@ public abstract class AbstractCreature implements Observer {
      * @param a The <tt>Ability</tt> to add.
      * @return  The instance of the object.
      */
-    public AbstractCreature addAbility(Ability a) {
+    public AbstractCreature addAbility(final Ability a) {
         abilities.add(a);
         return this;
     }
@@ -90,7 +93,13 @@ public abstract class AbstractCreature implements Observer {
         return evasion;
     }
 
-    public void setEvasion(int evasion) {
-        this.evasion = evasion;
+    @Override
+    public String toString(){
+        String n = System.getProperty("line.separator");
+        return "Name: " + name + n
+                + "HP total: " + hpTotal + n
+                + "HP currently: " + hp + n
+                + "Evasion: " + evasion + n
+                + "Bonus number: " + bonusNumber + n;
     }
 }

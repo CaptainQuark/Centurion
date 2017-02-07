@@ -25,7 +25,7 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
 
     @Override
     public <E extends Enum> Monster map(E e) {
-        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.MONSTER_DATA_FILE);
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.getInstance().MONSTER_DATA_FILE);
         ArrayList<HashMap<String, ArrayList<String>>> table = ODSFileHelper.readODSAtTab(f, 0);
         MonsterGenerator g;
 
@@ -52,7 +52,7 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
                         g.getValAsInt(MonsterValues.CRIT_CHANCE),
                         g.getValAsInt(MonsterValues.BOUNTY),
                         g.getValAsInt(MonsterValues.ACCURACY))
-                        .addAbility((CombatManager c) -> {
+                        .addAbility((final CombatManager c) -> {
                             if (c.getLastNumberThrownByUser() > 100)
                                 System.out.println("More than a 100 has been thrown - what a mighty shot!");
                         });

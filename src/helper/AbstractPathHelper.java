@@ -17,7 +17,7 @@ public abstract class AbstractPathHelper {
     private static final String fileSuffix = ".ser";
 
     private <T> void setEveryPathForSaveFiles(T t){
-        pathToRoot = createBasePath(t);
+        pathToRoot = createBasePath(t) + File.separator;
     }
 
     /**

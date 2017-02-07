@@ -3,6 +3,7 @@ package manager;
 import model.Hero;
 import model.Monster;
 
+import java.io.Serializable;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -12,7 +13,7 @@ import java.util.Observer;
  * @author Thomas Schönmann
  * @version %I%
  */
-public final class CombatManager extends Observable implements Observer, Cloneable {
+public final class CombatManager extends Observable implements Observer, Cloneable, Serializable {
 
     private int lastNumberThrownByUser;
     private int lastNumberThrownByMonster;

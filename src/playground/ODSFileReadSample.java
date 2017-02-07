@@ -15,7 +15,7 @@ public class ODSFileReadSample {
 
     public static void main(String...args){
 
-        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.HERO_DATA_FILE);
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.getInstance().HERO_DATA_FILE);
         //ArrayList<String> values = ODSFileHelper.extractColumn(ODSFileHelper.readODSAtTab(f, 0), "FACTION");
         ArrayList<String> values = ODSFileHelper.extractColumnTitles(ODSFileHelper.readODSAtTab(f, 0));
 

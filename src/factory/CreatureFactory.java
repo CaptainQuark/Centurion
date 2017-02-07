@@ -16,5 +16,5 @@ public interface CreatureFactory<T extends AbstractCreature> {
      * @param e     The type of  <tt>AbstractCreature</tt> requested.
      * @return      <tt>AbstractCreature</tt> object.
      */
-    public abstract <E extends Enum> T produce(E e);
+    <E extends Enum> T produce(E e);
 }

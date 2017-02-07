@@ -18,7 +18,7 @@ import java.util.HashMap;
  */
 public class HeroGeneratorSample {
 
-    private static File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.HERO_DATA_FILE);
+    private static File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.getInstance().HERO_DATA_FILE);
     private static ArrayList<HashMap<String, ArrayList<String>>> table = ODSFileHelper.readODSAtTab(f, 0);
     private static HeroGenerator generator = new HeroGenerator(table);
 
@@ -28,11 +28,7 @@ public class HeroGeneratorSample {
 
     static void factoryDemo(){
         Hero h = HeroFactory.getInstance().produce(HeroType.DEBUG_HERO);
-        System.out.println("HP: " + h.getName());
-        System.out.println("1. Faction: " + h.getPrimaryFaction());
-        System.out.println("2. Faction: " + h.getSecondaryFaction());
-        System.out.println("Evasion: " + h.getEvasion());
-        System.out.println("Costs: " + h.getPurchaseCosts());
+        System.out.println(h);
     }
 
     static void simpleDemo(){

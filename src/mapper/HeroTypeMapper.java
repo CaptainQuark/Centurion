@@ -22,7 +22,7 @@ public class HeroTypeMapper extends AbstractMapper<Hero> {
 
     @Override
     public <E extends Enum> Hero map(E e) {
-        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.HERO_DATA_FILE);
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.getInstance().HERO_DATA_FILE);
         ArrayList<HashMap<String, ArrayList<String>>> table = ODSFileHelper.readODSAtTab(f, 0);
         HeroGenerator g = new HeroGenerator(table);
 
@@ -36,7 +36,7 @@ public class HeroTypeMapper extends AbstractMapper<Hero> {
                         g.getFaction("NOT_IMPLEMENTED", "Primary"),
                         g.getFaction("NOT_IMPLEMENTED", "Secondary"),
                         g.getHitpoints(), 20, g.getEvasion(), g.getPurchaseCosts())
-                        .addAbility((CombatManager c) -> {
+                        .addAbility((final CombatManager c) -> {
                             if (c.getLastNumberThrownByUser() == c.getHero().getBonusNumber()) {
                                 System.out.println(c.getHero().getBonusNumber() + " - My (= " + c.getHero().getName() + ") bonus number has been thrown!");
                             } else {
