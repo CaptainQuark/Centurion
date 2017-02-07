@@ -24,7 +24,7 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
     // TODO Still strange behavior that 'new Monster(...)' has to be cast to Monster. Improvements needed.
 
     @Override
-    public <E extends Enum> Monster map(E e) {
+    public Monster map(Enum e) {
         File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.getInstance().MONSTER_DATA_FILE);
         ArrayList<HashMap<String, ArrayList<String>>> table = ODSFileHelper.readODSAtTab(f, 0);
         MonsterGenerator g;

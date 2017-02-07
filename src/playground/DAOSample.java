@@ -7,9 +7,6 @@ import enumerations.MonsterType;
 import factory.HeroFactory;
 import factory.MonsterFactory;
 import helper.Preference;
-import helper.StandardPathHelper;
-
-import java.io.File;
 
 /**
  * @author Thomas Schönmann
@@ -17,17 +14,17 @@ import java.io.File;
  */
 public class DAOSample {
 
-    static DAO dao = new SerialDAO();
+    private static DAO dao = new SerialDAO();
 
     public static void main(String...args){
+        loadPreferences();
         savePreferences();
         loadPreferences();
-    }
 
-    private static void delete(){
-        if(new File(StandardPathHelper.getInstance().getRootPath() + "\\Preference.ser").delete()){
-            System.out.println("File has been removed");
-        }
+        /*
+        if(dao.removeElementContainer(StandardPathHelper.getInstance().getRootPath() + "Preference.ser"))
+            System.out.println("Removal of file was successful.");
+            */
     }
 
     private static void loadPreferences(){

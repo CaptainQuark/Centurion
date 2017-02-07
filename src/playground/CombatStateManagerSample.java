@@ -12,7 +12,7 @@ import manager.CombatStateManager;
  * @author Thomas Schönmann
  * @version %I%
  */
-public class Playground {
+public class CombatStateManagerSample {
 
     public static void main(String...args){
 
@@ -35,7 +35,7 @@ public class Playground {
 
         // Simulate some throws by the user.
 
-        // No ability should should start working.
+        // No ability should start working.
         input.addThrow(55);
         System.out.println();
 

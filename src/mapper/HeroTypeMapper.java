@@ -21,7 +21,7 @@ import java.util.HashMap;
 public class HeroTypeMapper extends AbstractMapper<Hero> {
 
     @Override
-    public <E extends Enum> Hero map(E e) {
+    public Hero map(Enum e) {
         File f = new File(StandardPathHelper.getInstance().getDataPath() + Preference.getInstance().HERO_DATA_FILE);
         ArrayList<HashMap<String, ArrayList<String>>> table = ODSFileHelper.readODSAtTab(f, 0);
         HeroGenerator g = new HeroGenerator(table);

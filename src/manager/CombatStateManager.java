@@ -14,7 +14,7 @@ public class CombatStateManager extends StateManager<CombatManager> {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof CombatManager.LastCreatureProcessed) {
+        if (o instanceof CombatManager.AllCreaturesProcessedTeller) {
             //System.out.println("Every creature has been processed, autoPush() going to be called.");
             this.autoPush();
         }

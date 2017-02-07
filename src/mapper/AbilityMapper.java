@@ -1,7 +1,6 @@
 package mapper;
 
 import enumerations.AbilityType;
-import manager.CombatManager;
 import model.Ability;
 
 /**
@@ -11,7 +10,7 @@ import model.Ability;
 public class AbilityMapper extends AbstractMapper<Ability> {
 
     @Override
-    public <E extends Enum> Ability map(E e) {
+    public Ability map(Enum e) {
         AbilityType a = (AbilityType) e;
 
         switch (a){

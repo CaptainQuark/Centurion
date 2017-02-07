@@ -53,4 +53,13 @@ public interface DAO extends Serializable{
      * @return Boolean if operation succeeded.
      */
     <T> boolean saveList(Class<?> c, List<T> t);
+
+    /**
+     * Removes the whole container (i.e. a file on disk).
+     *
+     * @param t     Container of elements.
+     * @param <T>   Type of container.
+     * @return      Result if removal was successful.
+     */
+    <T> boolean removeElementContainer(T t);
 }

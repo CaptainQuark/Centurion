@@ -19,11 +19,11 @@ public final class CombatManager extends Observable implements Observer, Cloneab
     private int lastNumberThrownByMonster;
     private Hero hero;
     private Monster monster;
-    private LastCreatureProcessed lastCreatureProcessed;
+    private AllCreaturesProcessedTeller lastCreatureProcessed;
 
     // TODO Consider changing to take arguments (hero, monster).
     public CombatManager(){
-        lastCreatureProcessed = new LastCreatureProcessed();
+        lastCreatureProcessed = new AllCreaturesProcessedTeller();
     }
 
     /**
@@ -116,9 +116,9 @@ public final class CombatManager extends Observable implements Observer, Cloneab
         return super.clone();
     }
 
-    class LastCreatureProcessed extends Observable {
+    class AllCreaturesProcessedTeller extends Observable {
 
-        LastCreatureProcessed(){}
+        AllCreaturesProcessedTeller(){}
 
         private void tell(){
             setChanged();
