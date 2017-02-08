@@ -11,15 +11,15 @@ import java.util.Objects;
  * @author Thomas Schönmann
  * @version %I%
  */
-public abstract class Merchant<T> {
+public abstract class AbstractMerchant<T> {
 
-    protected T[] elements;
+    private T[] elements;
     private long timeToLeaveInMillis;
     private final int maxElements;
     private final String name;
 
 
-    public Merchant(Class<T> c, String name, int maxNumOfElements) {
+    AbstractMerchant(Class<T> c, String name, int maxNumOfElements) {
         elements = (T[]) Array.newInstance(c, maxNumOfElements);
 
         this.name = name;
@@ -34,14 +34,16 @@ public abstract class Merchant<T> {
         return new TimeCalculator();
     }
 
-    public boolean setElementInNextFreeSlot(T t){
+    public Integer setElementInNextFreeSlot(T t){
         Objects.requireNonNull(t, "The element to add to the merchant isn't allowed to be null.");
 
         for(int i = 0; i < elements.length; i++)
-            if(elements[i] == null)
-                return (elements[i] = t) != null;
+            if(elements[i] == null){
+                elements[i] = t;
+                return i;
+            }
 
-        return false;
+        return null;
     }
 
     public boolean removeElementAtNextUsedSlot(){
@@ -54,6 +56,13 @@ public abstract class Merchant<T> {
 
     public T[] getElements(){
         return elements;
+    }
+
+    public T getElement(int index){
+        if(index < maxElements && index >= 0)
+            throw new IllegalArgumentException("AbstractMerchant : getElement() : Provided index is out of bounds.");
+
+        return elements[index];
     }
 
     public boolean isMerchantGone(){

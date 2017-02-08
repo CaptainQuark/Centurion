@@ -1,16 +1,16 @@
 package mapper;
 
 import enumerations.MerchantType;
-import model.Merchant;
+import model.AbstractMerchant;
 
 /**
  * @author Thomas Schönmann
  * @version %I%
  */
-public class MerchantMapper extends AbstractMapper<Merchant> {
+public class MerchantMapper extends AbstractMapper<AbstractMerchant> {
 
     @Override
-    public Merchant map(Enum e) {
+    public AbstractMerchant map(Enum e) {
 
         switch ((MerchantType) e) {
             case DESSERT_WALKER:

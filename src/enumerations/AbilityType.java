@@ -5,5 +5,6 @@ package enumerations;
  * @version %I%
  */
 public enum AbilityType {
-    DEBUG
+    DEBUG,
+    HEAL_HERO_AT_BEGINNING_IF_HP_IS_UNDER_100,
 }

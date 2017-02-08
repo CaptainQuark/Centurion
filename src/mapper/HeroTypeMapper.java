@@ -1,11 +1,12 @@
 package mapper;
 
+import enumerations.AbilityType;
 import enumerations.HeroType;
+import factory.AbilityFactory;
 import generator.HeroGenerator;
 import helper.ODSFileHelper;
 import helper.Preference;
 import helper.StandardPathHelper;
-import manager.CombatManager;
 import model.Hero;
 
 import java.io.File;
@@ -36,13 +37,7 @@ public class HeroTypeMapper extends AbstractMapper<Hero> {
                         g.getFaction("NOT_IMPLEMENTED", "Primary"),
                         g.getFaction("NOT_IMPLEMENTED", "Secondary"),
                         g.getHitpoints(), 20, g.getEvasion(), g.getPurchaseCosts())
-                        .addAbility((final CombatManager c) -> {
-                            if (c.getLastNumberThrownByUser() == c.getHero().getBonusNumber()) {
-                                System.out.println(c.getHero().getBonusNumber() + " - My (= " + c.getHero().getName() + ") bonus number has been thrown!");
-                            } else {
-                                System.out.println(c.getLastNumberThrownByUser() + "...that's not my bonus number...");
-                            }
-                        });
+                        .addAbility(AbilityFactory.getInstance().produce(AbilityType.HEAL_HERO_AT_BEGINNING_IF_HP_IS_UNDER_100));
 
             default:
                 System.out.println("default @ switch @ map(...) @ HeroTypeMapper called.");

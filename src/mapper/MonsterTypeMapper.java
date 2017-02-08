@@ -5,7 +5,7 @@ import generator.MonsterGenerator;
 import helper.ODSFileHelper;
 import helper.Preference;
 import helper.StandardPathHelper;
-import manager.CombatManager;
+import manager.CombatState;
 import model.Monster;
 
 import java.io.File;
@@ -52,7 +52,7 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
                         g.getValAsInt(MonsterValues.CRIT_CHANCE),
                         g.getValAsInt(MonsterValues.BOUNTY),
                         g.getValAsInt(MonsterValues.ACCURACY))
-                        .addAbility((final CombatManager c) -> {
+                        .addAbility((final CombatState c) -> {
                             if (c.getLastNumberThrownByUser() > 100)
                                 System.out.println("More than a 100 has been thrown - what a mighty shot!");
                         });

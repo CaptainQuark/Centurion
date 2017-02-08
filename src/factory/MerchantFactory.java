@@ -1,8 +1,8 @@
 package factory;
 
+import model.AbstractMerchant;
 import model.Hero;
 import model.HeroMerchant;
-import model.Merchant;
 
 /**
  * @author Thomas Schönmann
@@ -18,7 +18,7 @@ public class MerchantFactory {
         return instance == null ? instance = new MerchantFactory() : instance;
     }
 
-    public Merchant produce(Class<? extends Merchant> c){
+    public AbstractMerchant produce(Class<? extends AbstractMerchant> c){
 
 
         if (c == HeroMerchant.class)

@@ -1,6 +1,6 @@
 package model;
 
-import manager.CombatManager;
+import manager.CombatState;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -46,14 +46,14 @@ public abstract class AbstractCreature implements Observer, Serializable {
 
     @Override
     public void update(Observable o, Object arg) {
-        if(!(arg instanceof CombatManager))
+        if(!(arg instanceof CombatState))
             throw new IllegalArgumentException("No combat manager provided for creature.");
 
-        System.out.println(name + "'s update with CombatManager as arg called.");
+        System.out.println(name + "'s update with CombatState as arg called.");
 
         // Delegate the CombatManger-object to every own action
         //  so they can operate with it.
-        abilities.forEach(a -> a.ability((CombatManager) arg));
+        abilities.forEach(a -> a.ability((CombatState) arg));
     }
 
     /*

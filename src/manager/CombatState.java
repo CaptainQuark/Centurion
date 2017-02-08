@@ -1,5 +1,6 @@
 package manager;
 
+import enumerations.CombatStatus;
 import model.Hero;
 import model.Monster;
 
@@ -13,22 +14,22 @@ import java.util.Observer;
  * @author Thomas Schönmann
  * @version %I%
  */
-public final class CombatManager extends Observable implements Observer, Cloneable, Serializable {
+public final class CombatState extends Observable implements Observer, Cloneable, Serializable {
 
     private int lastNumberThrownByUser;
     private int lastNumberThrownByMonster;
     private Hero hero;
     private Monster monster;
     private AllCreaturesProcessedTeller lastCreatureProcessed;
+    private CombatStatus status;
 
     // TODO Consider changing to take arguments (hero, monster).
-    public CombatManager(){
+    public CombatState(){
         lastCreatureProcessed = new AllCreaturesProcessedTeller();
+        status = CombatStatus.BEFORE_FIRST_ROUND_OF_ABILITIES;
     }
 
-    /**
-     * Really necessary? CombatManager already listens to user input by itself.
-     */
+    // TODO Really necessary? CombatState already listens to user input by itself.
     public void start(){
         // Add requiered logic.
     }
@@ -48,9 +49,30 @@ public final class CombatManager extends Observable implements Observer, Cloneab
      * Helper to fire Observer-related update-methods.
      */
     private void tellObservers(){
+
+        /*
+         * Tell every observer that a change in state has happened,
+         * implicitly that a throw by the user has been registered.
+         */
         setChanged();
         notifyObservers(this);
 
+        /*
+         * Change te status of this combat's state to indicate that
+         *  abilities may have been applied by the creatures.
+         */
+        status = CombatStatus.AFTER_FIRST_ROUND_OF_ABILITIES;
+
+        /*
+         * Active the observers' update method once again.
+         */
+        setChanged();
+        notifyObservers(this);
+
+        /*
+         * Tell every observer who wants to know when the combat
+         *  has finished.
+         */
         this.lastCreatureProcessed.tell();
     }
 
@@ -66,7 +88,7 @@ public final class CombatManager extends Observable implements Observer, Cloneab
      * Getters and setters.
      */
 
-    public CombatManager setHero(Hero h){
+    public CombatState setHero(Hero h){
         this.hero = h;
         //instance.addObserver(h);
         //return instance;
@@ -74,7 +96,7 @@ public final class CombatManager extends Observable implements Observer, Cloneab
         return this;
     }
 
-    public CombatManager setMonster(Monster m){
+    public CombatState setMonster(Monster m){
         this.monster = m;
         //instance.addObserver(m);
         //return instance;
@@ -82,9 +104,13 @@ public final class CombatManager extends Observable implements Observer, Cloneab
         return this;
     }
 
-    public CombatManager setStateManagerObserver(StateManager s){
+    public CombatState setStateManagerObserver(StateManager s){
         lastCreatureProcessed.addObserver(s);
         return this;
+    }
+
+    public CombatStatus getStatus(){
+        return status;
     }
 
     public int getLastNumberThrownByUser() {

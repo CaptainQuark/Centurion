@@ -5,7 +5,7 @@ import enumerations.MonsterType;
 import factory.HeroFactory;
 import factory.MonsterFactory;
 import input.InputSimulator;
-import manager.CombatManager;
+import manager.CombatState;
 import manager.CombatStateManager;
 
 /**
@@ -18,7 +18,7 @@ public class CombatStateManagerSample {
 
         // '.start()' currently has no effect.
 
-        CombatManager combatManager = new CombatManager()
+        CombatState combatManager = new CombatState()
                 .setHero(HeroFactory.getInstance().produce(HeroType.DEBUG_HERO))
                 .setMonster(MonsterFactory.getInstance().produce(MonsterType.DEBUG_MONSTER));
 
@@ -27,24 +27,16 @@ public class CombatStateManagerSample {
         // Set the initial state.
         CombatStateManager combatStateManager = new CombatStateManager(combatManager);
 
-        // Tell the CombatManager that someone (= StateManager) wants to observe him.
+        // Tell the CombatState that someone (= StateManager) wants to observe him.
         combatStateManager.peek().setStateManagerObserver(combatStateManager);
 
-        // Register CombatManager as observer for inputs.
+        // Register CombatState as observer for inputs.
         input.addObserver(combatStateManager.peek());
 
         // Simulate some throws by the user.
 
         // No ability should start working.
-        input.addThrow(55);
-        System.out.println();
-
-        // The hero's ability should fire.
-        input.addThrow(20);
-        System.out.println();
-
-        // The monster's ability should fire.
-        input.addThrow(120);
+        input.addThrow(300);
         System.out.println();
 
         System.out.println("Number of states: " + combatStateManager.getNumOfStates());

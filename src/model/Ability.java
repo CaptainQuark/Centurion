@@ -1,6 +1,6 @@
 package model;
 
-import manager.CombatManager;
+import manager.CombatState;
 
 import java.io.Serializable;
 
@@ -9,5 +9,5 @@ import java.io.Serializable;
  * @version %I%
  */
 public interface Ability extends Serializable{
-    void ability(CombatManager c);
+    void ability(CombatState c);
 }
