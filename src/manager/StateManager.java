@@ -3,6 +3,7 @@ package manager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +14,7 @@ import java.util.logging.Logger;
  * @author Thomas Schönmann
  * @version %I%
  */
-public abstract class StateManager<T extends Cloneable> implements Observer {
+public abstract class StateManager<T extends Cloneable> extends Observable implements Observer {
 
     private final ArrayList<T> states;
 

@@ -3,6 +3,7 @@ package manager;
 import dao.DAO;
 import model.Hero;
 import model.Monster;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -32,11 +33,19 @@ public class CreatureManager {
     }
 
     public boolean addHero(Hero h){
-        return heroes.add(h);
+        return heroes.add(h) && dao.saveList(Hero.class, heroes);
     }
 
     public boolean addMonster(Monster m){
-        return monsters.add(m);
+        return monsters.add(m) && dao.saveList(Monster.class, monsters);
+    }
+
+    public boolean removeHero(Hero h){
+        return dao.removeElement(h) && heroes.remove(h);
+    }
+
+    public boolean removeMonster(Monster m){
+        return dao.removeElement(m) && monsters.remove(m);
     }
 
     public ArrayList<Hero> getHeroes() {
@@ -47,12 +56,14 @@ public class CreatureManager {
         return monsters;
     }
 
+    @Nullable
     private static ArrayList<Hero> retrieveAllHeros() {
         return dao.getAllElements(Hero.class) != null
                 ? dao.getAllElements(Hero.class).stream().filter(c -> c instanceof Hero).map(c -> (Hero) c).collect(Collectors.toCollection(ArrayList::new))
                 : null;
     }
 
+    @Nullable
     private static ArrayList<Monster> retrieveAllMonsters() {
         return dao.getAllElements(Monster.class) != null
                 ? dao.getAllElements(Monster.class).stream().filter(c -> c instanceof Monster).map(c -> (Monster) c).collect(Collectors.toCollection(ArrayList::new))

@@ -18,10 +18,8 @@ public abstract class AbstractMerchant<T> {
     private final int maxElements;
     private final String name;
 
-
     AbstractMerchant(Class<T> c, String name, int maxNumOfElements) {
         elements = (T[]) Array.newInstance(c, maxNumOfElements);
-
         this.name = name;
         this.maxElements = maxNumOfElements;
     }
@@ -34,7 +32,7 @@ public abstract class AbstractMerchant<T> {
         return new TimeCalculator();
     }
 
-    public Integer setElementInNextFreeSlot(T t){
+    public Integer addElementToNextFreeSlot(T t){
         Objects.requireNonNull(t, "The element to add to the merchant isn't allowed to be null.");
 
         for(int i = 0; i < elements.length; i++)
