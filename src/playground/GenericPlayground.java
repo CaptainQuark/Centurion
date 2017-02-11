@@ -1,8 +1,14 @@
 package playground;
 
+import dao.DAO;
+import dao.SerialDAO;
 import enumerations.HeroType;
+import factory.HeroFactory;
 import factory.MerchantFactory;
+import model.Hero;
 import model.HeroMerchant;
+
+import java.util.ArrayList;
 
 /**
  * @author Thomas Schönmann
@@ -11,7 +17,22 @@ import model.HeroMerchant;
 public class GenericPlayground {
 
     public static void main(String...args){
-        demo2();
+        demoDAOByStringFilename();
+        //demo2();
+    }
+
+    private static void demoDAOByStringFilename(){
+        ArrayList<Hero> heroes = new ArrayList<>();
+
+        for(int i = 0; i < 20; i++){
+            heroes.add(HeroFactory.getInstance().produce(HeroType.DEBUG_HERO));
+        }
+
+        DAO dao = new SerialDAO();
+
+        dao.saveList("USER_HEROES", heroes);
+
+        dao.getAllElements("USER_HEROES").forEach(System.out::print);
     }
 
     private static void demo2(){

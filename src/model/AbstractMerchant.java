@@ -1,8 +1,9 @@
 package model;
 
+import dao.DAO;
 import helper.TimeHelper;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -13,18 +14,23 @@ import java.util.Objects;
  */
 public abstract class AbstractMerchant<T> {
 
-    private T[] elements;
+    //private T[] elements;
+    private ArrayList<T> elements;
     private long timeToLeaveInMillis;
     private final int maxElements;
     private final String name;
+    private DAO dao;
 
-    AbstractMerchant(Class<T> c, String name, int maxNumOfElements) {
-        elements = (T[]) Array.newInstance(c, maxNumOfElements);
+    @SuppressWarnings("unchecked")
+    AbstractMerchant(DAO dao, final String name, final int maxNumOfElements) {
+        this.dao = dao;
         this.name = name;
         this.maxElements = maxNumOfElements;
+        elements = getFromDisk() != null ? getFromDisk() : new ArrayList<>(maxElements);
+        setTimeToLeaveNextMidnight();
     }
 
-    public void setTimeToLeaveNextMidnight(){
+    private void setTimeToLeaveNextMidnight(){
         timeToLeaveInMillis = TimeHelper.getNextMidnightInMillis();
     }
 
@@ -35,24 +41,29 @@ public abstract class AbstractMerchant<T> {
     public Integer addElementToNextFreeSlot(T t){
         Objects.requireNonNull(t, "The element to add to the merchant isn't allowed to be null.");
 
-        for(int i = 0; i < elements.length; i++)
-            if(elements[i] == null){
-                elements[i] = t;
-                return i;
-            }
+        for(int i = 0; i < maxElements; i++)
+            if(elements.get(i) == null)
+                return (elements.set(i, t) != null) && saveItemsToDisk() ? i : null;
 
         return null;
     }
 
     public boolean removeElementAtNextUsedSlot(){
         for(int i = 0; i < maxElements; i++)
-            if(elements[i] != null)
-                return (elements[i] = null) == null;
+            if(elements.get(i) != null)
+                return removeElementAtIndex(i) && saveItemsToDisk();
 
         return false;
     }
 
-    public T[] getElements(){
+    public boolean removeElementAtIndex(int index){
+        if (index >= maxElements || index < 0)
+            throw new IllegalArgumentException("AbstractMerchant : removeElementAtIndex : Index isn't allowed to be null.");
+
+        return (elements.set(index, null) == null) && saveItemsToDisk();
+    }
+
+    public ArrayList<T> getElements(){
         return elements;
     }
 
@@ -60,8 +71,24 @@ public abstract class AbstractMerchant<T> {
         if(index < maxElements && index >= 0)
             throw new IllegalArgumentException("AbstractMerchant : getElement() : Provided index is out of bounds.");
 
-        return elements[index];
+        return elements.get(index);
     }
+
+    private boolean saveItemsToDisk(){
+        if(dao == null || elements == null)
+            throw new NullPointerException("AbstractMerchant : saveItemsToDisk : DAO or items aren't allowed to be null.");
+
+        return dao.saveList(getFileName(), elements);
+    }
+
+    private ArrayList<T> getFromDisk(){
+        if(dao == null || elements == null)
+            throw new NullPointerException("AbstractMerchant : getFromDisk : DAO isn't allowed to be null.");
+
+        return dao.getAllElements(getFileName());
+    }
+
+    protected abstract String getFileName();
 
     public boolean isMerchantGone(){
         return timeToLeaveInMillis > System.currentTimeMillis();

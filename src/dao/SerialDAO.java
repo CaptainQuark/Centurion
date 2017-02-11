@@ -43,6 +43,28 @@ public class SerialDAO implements DAO {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <T> ArrayList<T> getAllElements(String fileName) {
+        Objects.requireNonNull(fileName);
+
+        ArrayList<T> elements = new ArrayList<>();
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + fileName + ".ser");
+
+        if (f.isFile()) {
+            try {
+                FileInputStream fis = new FileInputStream(f.getAbsolutePath());
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                elements = ((ArrayList<T>) ois.readObject());
+                ois.close();
+                fis.close();
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return elements;
+    }
+
+    @Override
     public <T> boolean removeElement(T t) {
         @SuppressWarnings("unchecked")
         Class<T> cl = (Class<T>) t.getClass();
@@ -56,12 +78,30 @@ public class SerialDAO implements DAO {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> boolean saveList(Class<?> c, List<T> t) {
-        if (getFileByType(c).getAbsolutePath() != null)
-            System.out.println("Save file: " + getFileByType(c).getAbsolutePath());
+        System.out.println("Save file: " + getFileByType(c).getAbsolutePath());
 
         try {
             FileOutputStream fos = new FileOutputStream(getFileByType(c).toString());
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(t);
+            oos.close();
+            fos.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public <T> boolean saveList(String fileName, List<T> t) {
+        File f = new File(StandardPathHelper.getInstance().getDataPath() + fileName + ".ser");
+        System.out.println("Save file: " + f.getAbsolutePath());
+
+        try {
+            FileOutputStream fos = new FileOutputStream(f.toString());
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(t);
             oos.close();

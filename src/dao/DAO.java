@@ -21,6 +21,15 @@ public interface DAO extends Serializable{
     <T> ArrayList<T> getAllElements(Class<?> c);
 
     /**
+     * Retrieve elements by file-name.
+     *
+     * @param fileName  Name of the file to look for.
+     * @param <T>       Type of return-values.
+     * @return          <code>ArrayList</code> of elements.
+     */
+    <T> ArrayList<T> getAllElements(String fileName);
+
+    /**
      * Retrieve a single element from a file.
      *
      * @param c The class by which to look for the element.
@@ -53,6 +62,16 @@ public interface DAO extends Serializable{
      * @return Boolean if operation succeeded.
      */
     <T> boolean saveList(Class<?> c, List<T> t);
+
+    /**
+     * Save an array of elements by file name.
+     *
+     * @param fileName  The name of the file to save.
+     * @param t         The list of save.
+     * @param <T>       The return-list's type.
+     * @return          List of elements.
+     */
+    <T> boolean saveList(String fileName, List<T> t);
 
     /**
      * Removes the whole container (i.e. a file on disk).

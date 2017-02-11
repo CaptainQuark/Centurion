@@ -1,5 +1,8 @@
 package model;
 
+import dao.DAO;
+import enumerations.FileNames;
+
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -13,34 +16,34 @@ import java.util.stream.Collectors;
 public class HospitalMerchant {
 
     private final int maxHeroes = 3;
-    private HeroWrapper[] heroes;
+    private ArrayList<HeroWrapper> heroes;
+    private ArrayList<Hero> userHeroes;
+    private DAO dao;
 
-    public HospitalMerchant() {
-        heroes = new HeroWrapper[maxHeroes];
-    }
+    public HospitalMerchant(DAO dao) {
+        this.dao = dao;
 
-    public HospitalMerchant(ArrayList<Hero> heroes) {
-        this.heroes = new HeroWrapper[maxHeroes];
-        ArrayList<Hero> sickHeroes = heroes.stream().filter(Hero::getInMedication).collect(Collectors.toCollection(ArrayList::new));
+        this.heroes = new ArrayList<>();
+        this.userHeroes = getFromDisk().stream().filter(Hero::getInMedication).collect(Collectors.toCollection(ArrayList::new));
 
-        if (sickHeroes.size() < maxHeroes)
-            heroes.forEach(this::setHeroInNextFreeSlot);
+        if (userHeroes.size() < maxHeroes)
+            userHeroes.forEach(this::setHeroInNextFreeSlot);
 
-        else{
-            heroes.forEach(h -> h.setInMedication(false));
-            System.out.println("Not enough medication space available, no hero will be treated.");
+        else {
+            userHeroes.forEach(h -> h.setInMedication(false));
+            dao.saveList(FileNames.USER_HEROES.name(), heroes);
+            System.out.println("Not enough medication space available, no hero will be treated and everyone is freed from medication. Critical error.");
         }
     }
+
 
     public Integer setHeroInNextFreeSlot(Hero hero) {
         Objects.requireNonNull(hero, "The element to add to the merchant isn't allowed to be null.");
+        hero.setInMedication(true);
 
-        for (int i = 0; i < heroes.length; i++) {
-            if (heroes[i] == null) {
-                heroes[i] = new HeroWrapper(hero);
-                return i;
-            }
-        }
+        for (int i = 0; i < maxHeroes; i++)
+            if (heroes.get(i) == null)
+                return heroes.set(i, new HeroWrapper(hero)) != null && saveUserHeroesToDisk() ? i : null;
 
         System.out.println("No free medication available.");
         return null;
@@ -48,7 +51,7 @@ public class HospitalMerchant {
 
     private HeroWrapper getHeroWrapper(int i) {
         if (i >= 0 && i < maxHeroes)
-            return heroes[i];
+            return heroes.get(i);
 
         throw new IllegalArgumentException("HospitalMerchant : getHeroWrapper() : Provided index is out of bounds.");
     }
@@ -65,19 +68,34 @@ public class HospitalMerchant {
         if (index < 0 && index >= maxHeroes)
             throw new IllegalArgumentException("HospitalMerchant : instantHealHeroByIndex() : Provided index is out of bounds.");
 
-        heroes[index].getHero().setHp(heroes[index].getHero().getHpTotal());
-        heroes[index].getHero().setInMedication(false);
-        heroes[index] = null;
-        return true;
+        int indexToOverride = userHeroes.indexOf(heroes.get(index).getHero());
+        userHeroes.get(indexToOverride).setInMedication(false);
+        heroes.set(index, null);
+
+        return saveUserHeroesToDisk();
     }
 
     public boolean abortMedication(int index) {
         if (index < 0 && index >= maxHeroes)
             throw new IllegalArgumentException("HospitalMerchant : abortMedication() : Provided index is out of bounds.");
 
-        heroes[index].getHero().setInMedication(false);
-        heroes[index] = null;
-        return true;
+        int indexToOverride = userHeroes.indexOf(heroes.get(index).getHero());
+        userHeroes.get(indexToOverride).setInMedication(false);
+        return heroes.set(index, null) == null && saveUserHeroesToDisk();
+    }
+
+    private boolean saveUserHeroesToDisk() {
+        if (dao == null || userHeroes == null)
+            throw new NullPointerException("AbstractMerchant : saveUserHeroesToDisk : DAO or items aren't allowed to be null.");
+
+        return dao.saveList(FileNames.USER_HEROES.name(), userHeroes);
+    }
+
+    private ArrayList<Hero> getFromDisk() {
+        if (dao == null || heroes == null)
+            throw new NullPointerException("AbstractMerchant : getFromDisk : DAO isn't allowed to be null.");
+
+        return dao.getAllElements(FileNames.USER_HEROES.name());
     }
 
     private class HeroWrapper {
