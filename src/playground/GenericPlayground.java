@@ -2,11 +2,13 @@ package playground;
 
 import dao.DAO;
 import dao.SerialDAO;
+import enumerations.FileNames;
 import enumerations.HeroType;
 import factory.HeroFactory;
-import factory.MerchantFactory;
 import model.Hero;
 import model.HeroMerchant;
+import model.HospitalMerchant;
+import model.ItemMerchant;
 
 import java.util.ArrayList;
 
@@ -17,8 +19,74 @@ import java.util.ArrayList;
 public class GenericPlayground {
 
     public static void main(String...args){
-        demoDAOByStringFilename();
+        //demoID();
+        //printHeroes();
+        //demoHospitalMerchant();
+        //demoDAOByStringFilename();
         //demo2();
+        //demoHeroEqual();
+        //demoHeroMerchant();
+        demoItemMerchant();
+    }
+
+    private static void demoItemMerchant() {
+        DAO dao = new SerialDAO();
+        ItemMerchant itemMerchant = new ItemMerchant(dao, "Dummy item merchant", 20);
+
+        System.out.println();
+        itemMerchant.getMerchantElements().forEach(System.out::println);
+    }
+
+    private static void demoHeroMerchant() {
+        DAO dao = new SerialDAO();
+        HeroMerchant m = new HeroMerchant(dao, "Dummy merchant", 3);
+
+        m.sellElement(m.getMerchantElements().indexOf(m.getMerchantElements().get(0)));
+
+        System.out.println();
+        m.getMerchantElements().forEach(System.out::println);
+    }
+
+    private static void demoID() {
+        ArrayList<Hero> heroes = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            heroes.add(HeroFactory.getInstance().produce(HeroType.DEBUG_HERO));
+            new SerialDAO().saveList(FileNames.USER_HEROES.name(), heroes);
+        }
+
+        System.out.println();
+        heroes.forEach(System.out::println);
+    }
+
+    private static void demoHeroEqual() {
+        DAO dao = new SerialDAO();
+        Hero h = dao.<Hero>getAllElements(FileNames.USER_HEROES.name()).get(0);
+
+        if (dao.<Hero>getAllElements(FileNames.USER_HEROES.name()).contains(h))
+            System.out.println("Hero is in list.");
+        else System.out.println("No hero in list detected.");
+    }
+
+    private static void demoHospitalMerchant() {
+        DAO dao = new SerialDAO();
+        HospitalMerchant hospitalMerchant = new HospitalMerchant(new SerialDAO());
+
+        for (int i = 0; i < 2; i++) {
+            hospitalMerchant.setHeroInNextFreeSlot(dao.<Hero>getAllElements(FileNames.USER_HEROES.name()).get(i));
+        }
+
+        System.out.println();
+        printHeroes();
+
+
+        //dao.<Hero>getAllElements(FileNames.USER_HEROES.name()).forEach(System.out::println);
+    }
+
+    private static void printHeroes() {
+        DAO dao = new SerialDAO();
+        System.out.println();
+        dao.<Hero>getAllElements(FileNames.USER_HEROES.name()).forEach(System.out::println);
     }
 
     private static void demoDAOByStringFilename(){
@@ -41,13 +109,5 @@ public class GenericPlayground {
         double c = 1200;
         int d = 1000;
         System.out.println((i - j) * (c / 1000.0));
-    }
-
-    private static void demo(Enum e){
-        if(MerchantFactory.getInstance().produce(HeroMerchant.class) == null){
-            System.out.println("No merchant created.");
-        }
-
-        demo(HeroType.DEBUG_HERO);
     }
 }

@@ -20,26 +20,26 @@ public class SerialDAO implements DAO {
     @SuppressWarnings("unchecked")
     @Override
     public <T> ArrayList<T> getAllElements(Class<?> t) {
-        ArrayList<T> elements = null;
+        ArrayList<T> elements;
         File f = getFileByType(t).getAbsoluteFile();
 
 		/*
          * Hint: Calling '.exists' on a file also returns true if
 		 *  the file is a path! I may have saved you some coffee ;)
 		 */
-        if (f != null && f.isFile()) {
+        if (f.isFile()) {
             try {
                 FileInputStream fis = new FileInputStream(f.getAbsolutePath());
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 elements = ((ArrayList<T>) ois.readObject());
                 ois.close();
                 fis.close();
-            } catch (IOException e) {
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                return elements;
+            } catch (IOException | ClassNotFoundException e) {
             }
         }
-        return elements;
+
+        return null;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class SerialDAO implements DAO {
     public <T> ArrayList<T> getAllElements(String fileName) {
         Objects.requireNonNull(fileName);
 
-        ArrayList<T> elements = new ArrayList<>();
+        ArrayList<T> elements;
         File f = new File(StandardPathHelper.getInstance().getDataPath() + fileName + ".ser");
 
         if (f.isFile()) {
@@ -57,11 +57,14 @@ public class SerialDAO implements DAO {
                 elements = ((ArrayList<T>) ois.readObject());
                 ois.close();
                 fis.close();
+
+                return elements;
             } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
             }
         }
-        return elements;
+
+        return null;
     }
 
     @Override
@@ -131,24 +134,25 @@ public class SerialDAO implements DAO {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getSingleElement(Class<?> c) {
-        T t = null;
+        T t;
         File f = getFileByType(c).getAbsoluteFile();
 		/*
 		 * Hint: Calling '.exists' on a file also returns true if the file is a
 		 * path! I may have saved you some coffee ;)
 		 */
-        if (f != null && f.isFile()) {
+        if (f.isFile()) {
             try {
                 FileInputStream fis = new FileInputStream(f.getAbsolutePath());
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 t = (T) ois.readObject();
                 ois.close();
                 fis.close();
+                return t;
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
-        return t;
+        return null;
     }
 
     @Override

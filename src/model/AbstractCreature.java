@@ -1,5 +1,6 @@
 package model;
 
+import generator.SequentialIDGenerator;
 import manager.CombatState;
 
 import java.io.Serializable;
@@ -14,7 +15,7 @@ import java.util.Observer;
  * @author Thomas Schönmann
  * @version %I%
  */
-public abstract class AbstractCreature implements Observer, Serializable {
+public abstract class AbstractCreature extends SequentialIDGenerator<AbstractCreature> implements Observer, Serializable {
 
     private final String name;
     private final int hpTotal;
@@ -24,6 +25,7 @@ public abstract class AbstractCreature implements Observer, Serializable {
     private ArrayList<Ability> abilities;
 
     AbstractCreature(String name, int hpTotal, int bonusNumber, int evasion){
+        super(true);
         this.name = name;
         this.hpTotal = hpTotal;
         this.bonusNumber = bonusNumber;
@@ -94,9 +96,23 @@ public abstract class AbstractCreature implements Observer, Serializable {
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof AbstractCreature))
+            return false;
+
+        if (other == this)
+            return true;
+
+        AbstractCreature a = (AbstractCreature) other;
+
+        return a.getElementID() == this.getElementID();
+    }
+
+    @Override
     public String toString(){
         String n = System.getProperty("line.separator");
         return "Name: " + name + n
+                + "ID: " + getElementID() + n
                 + "HP total: " + hpTotal + n
                 + "HP currently: " + hp + n
                 + "Evasion: " + evasion + n

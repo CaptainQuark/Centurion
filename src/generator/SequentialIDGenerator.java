@@ -27,7 +27,7 @@ public abstract class SequentialIDGenerator<T extends SequentialIDGenerator<?>> 
      * @param b	Single purpose is to force the subclass of calling the constructor.
      */
     public SequentialIDGenerator(boolean b){
-        elementID = (this.provideAllElements() != null) ? generateHighestId(this.provideAllElements()) : 1;
+        elementID = (this.provideAllElements() != null) ? generateHighestId(this.provideAllElements()) : 0;
     }
 
     /**

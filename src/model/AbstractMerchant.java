@@ -14,20 +14,46 @@ import java.util.Objects;
  */
 public abstract class AbstractMerchant<T> {
 
-    //private T[] elements;
-    private ArrayList<T> elements;
+    private ArrayList<T> merchantElements;
+    private ArrayList<T> userElements;
     private long timeToLeaveInMillis;
     private final int maxElements;
     private final String name;
     private DAO dao;
 
-    @SuppressWarnings("unchecked")
     AbstractMerchant(DAO dao, final String name, final int maxNumOfElements) {
+        System.out.println("AbstractMerchant constructor called.");
+
         this.dao = dao;
         this.name = name;
         this.maxElements = maxNumOfElements;
-        elements = getFromDisk() != null ? getFromDisk() : new ArrayList<>(maxElements);
+        merchantElements = retrieveElementsFromDisk(getMerchantElementsFileName()) != null
+                ? retrieveElementsFromDisk(getMerchantElementsFileName())
+                : initializeMerchantElements();
+        userElements = retrieveElementsFromDisk(getUserElementsFileName()) != null
+                ? retrieveElementsFromDisk(getUserElementsFileName())
+                : new ArrayList<>();
+
+        System.out.println("merchantElement: " + merchantElements.size());
+        System.out.println("userElements: " + userElements.size());
+        System.out.println("retrieveElementsFromDisk: " + retrieveElementsFromDisk(getMerchantElementsFileName()).size());
+
+        if (retrieveElementsFromDisk(getMerchantElementsFileName()) == null)
+            System.out.println("retrieveElementsFromDisk(getMerchantElementsFileName()) null.");
+
         setTimeToLeaveNextMidnight();
+    }
+
+    private ArrayList<T> initializeMerchantElements() {
+        System.out.println("initializeMerchantElements() called.");
+        ArrayList<T> list = new ArrayList<>();
+
+        for (int i = 0; i < maxElements; i++) {
+            list.add(createElement());
+            saveElementsToDisk(getMerchantElementsFileName(), list);
+        }
+
+        return list;
     }
 
     private void setTimeToLeaveNextMidnight(){
@@ -42,53 +68,70 @@ public abstract class AbstractMerchant<T> {
         Objects.requireNonNull(t, "The element to add to the merchant isn't allowed to be null.");
 
         for(int i = 0; i < maxElements; i++)
-            if(elements.get(i) == null)
-                return (elements.set(i, t) != null) && saveItemsToDisk() ? i : null;
+            if (merchantElements.get(i) == null) {
+                merchantElements.set(i, t);
+                return saveElementsToDisk(getMerchantElementsFileName(), merchantElements) ? i : null;
+            }
 
         return null;
     }
 
     public boolean removeElementAtNextUsedSlot(){
         for(int i = 0; i < maxElements; i++)
-            if(elements.get(i) != null)
-                return removeElementAtIndex(i) && saveItemsToDisk();
+            if (merchantElements.get(i) != null)
+                return removeElement(i) && saveElementsToDisk(getMerchantElementsFileName(), merchantElements);
 
         return false;
     }
 
-    public boolean removeElementAtIndex(int index){
-        if (index >= maxElements || index < 0)
-            throw new IllegalArgumentException("AbstractMerchant : removeElementAtIndex : Index isn't allowed to be null.");
+    public boolean sellElement(int index) {
+        if (index >= maxElements || index < 0 || merchantElements.get(index) == null)
+            throw new IllegalArgumentException("AbstractMerchant : removeElement : Index or value isn't allowed to be null.");
 
-        return (elements.set(index, null) == null) && saveItemsToDisk();
+        userElements.add(merchantElements.get(index));
+        merchantElements.set(index, null);
+
+        return saveElementsToDisk(getMerchantElementsFileName(), merchantElements) && saveElementsToDisk(getUserElementsFileName(), userElements);
     }
 
-    public ArrayList<T> getElements(){
-        return elements;
+    public boolean removeElement(int index) {
+        if (index >= maxElements || index < 0)
+            throw new IllegalArgumentException("AbstractMerchant : removeElement : Index isn't allowed to be null.");
+
+        merchantElements.set(index, null);
+        return saveElementsToDisk(getMerchantElementsFileName(), merchantElements);
+    }
+
+    public ArrayList<T> getMerchantElements() {
+        return merchantElements;
     }
 
     public T getElement(int index){
         if(index < maxElements && index >= 0)
             throw new IllegalArgumentException("AbstractMerchant : getElement() : Provided index is out of bounds.");
 
-        return elements.get(index);
+        return merchantElements.get(index);
     }
 
-    private boolean saveItemsToDisk(){
-        if(dao == null || elements == null)
-            throw new NullPointerException("AbstractMerchant : saveItemsToDisk : DAO or items aren't allowed to be null.");
+    private boolean saveElementsToDisk(String fileName, ArrayList<T> elements) {
+        if (dao == null || fileName == null)
+            throw new NullPointerException("AbstractMerchant : saveMerchantElementsToDisk : DAO or items aren't allowed to be null.");
 
-        return dao.saveList(getFileName(), elements);
+        return dao.saveList(fileName, elements);
     }
 
-    private ArrayList<T> getFromDisk(){
-        if(dao == null || elements == null)
-            throw new NullPointerException("AbstractMerchant : getFromDisk : DAO isn't allowed to be null.");
+    private ArrayList<T> retrieveElementsFromDisk(String fileName) {
+        if (dao == null || fileName == null)
+            throw new NullPointerException("AbstractMerchant : retrieveMerchantElementsFromDisk : DAO isn't allowed to be null.");
 
-        return dao.getAllElements(getFileName());
+        return dao.getAllElements(fileName);
     }
 
-    protected abstract String getFileName();
+    protected abstract String getMerchantElementsFileName();
+
+    protected abstract String getUserElementsFileName();
+
+    protected abstract T createElement();
 
     public boolean isMerchantGone(){
         return timeToLeaveInMillis > System.currentTimeMillis();
@@ -103,10 +146,9 @@ public abstract class AbstractMerchant<T> {
     }
 
     public class TimeCalculator {
-
         private long time = 0;
 
-        private TimeCalculator(){
+        private TimeCalculator() {
         }
 
         public TimeCalculator addMilliseconds(long millis){

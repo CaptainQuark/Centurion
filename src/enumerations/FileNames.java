@@ -9,5 +9,5 @@ public enum FileNames {
     USER_HEROES,
     MERCHANT_ITEMS,
     USER_ITEMS,
-    HOSPITAL_HEROES
+    MONSTERS
 }

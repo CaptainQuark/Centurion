@@ -1,8 +1,12 @@
 package model;
 
+import dao.SerialDAO;
 import enumerations.Biome;
 import enumerations.Checkout;
+import enumerations.FileNames;
 import enumerations.MonsterDifficulty;
+
+import java.util.List;
 
 /**
  * @author Thomas Schönmann
@@ -104,5 +108,10 @@ public class Monster extends AbstractCreature {
                 + "Block: " + block + n
                 + "Bounty: " + bounty + n
                 + "Accuracy: " + accuracy + n;
+    }
+
+    @Override
+    protected List<AbstractCreature> provideAllElements() {
+        return new SerialDAO().getAllElements(FileNames.MONSTERS.name());
     }
 }

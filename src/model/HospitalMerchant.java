@@ -4,6 +4,7 @@ import dao.DAO;
 import enumerations.FileNames;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -16,22 +17,25 @@ import java.util.stream.Collectors;
 public class HospitalMerchant {
 
     private final int maxHeroes = 3;
-    private ArrayList<HeroWrapper> heroes;
+    private ArrayList<HeroWrapper> hospitalHeroes;
     private ArrayList<Hero> userHeroes;
     private DAO dao;
 
     public HospitalMerchant(DAO dao) {
         this.dao = dao;
 
-        this.heroes = new ArrayList<>();
-        this.userHeroes = getFromDisk().stream().filter(Hero::getInMedication).collect(Collectors.toCollection(ArrayList::new));
+        this.hospitalHeroes = new ArrayList<>(maxHeroes);
+        this.hospitalHeroes.addAll(Arrays.asList(null, null, null));
+        this.userHeroes = getFromDisk();
 
-        if (userHeroes.size() < maxHeroes)
-            userHeroes.forEach(this::setHeroInNextFreeSlot);
+        System.out.println("userHeroes: " + userHeroes.size());
+
+        if (userHeroes.stream().filter(Hero::getInMedication).collect(Collectors.toCollection(ArrayList::new)).size() < maxHeroes)
+            userHeroes.stream().filter(Hero::getInMedication).collect(Collectors.toCollection(ArrayList::new)).forEach(this::setHeroInNextFreeSlot);
 
         else {
             userHeroes.forEach(h -> h.setInMedication(false));
-            dao.saveList(FileNames.USER_HEROES.name(), heroes);
+            dao.saveList(FileNames.USER_HEROES.name(), hospitalHeroes);
             System.out.println("Not enough medication space available, no hero will be treated and everyone is freed from medication. Critical error.");
         }
     }
@@ -39,11 +43,22 @@ public class HospitalMerchant {
 
     public Integer setHeroInNextFreeSlot(Hero hero) {
         Objects.requireNonNull(hero, "The element to add to the merchant isn't allowed to be null.");
+
+        System.out.println("User heroes: " + userHeroes.size());
+
+        // Alter both the local 'hero' (saved in Wrapper) + matching Hero-Object in user's list. Order is important!
+        for (int i = 0; i < maxHeroes; i++)
+            if (hero.getElementID() == userHeroes.get(i).getElementID())
+                userHeroes.get(i).setInMedication(true);
+
         hero.setInMedication(true);
 
         for (int i = 0; i < maxHeroes; i++)
-            if (heroes.get(i) == null)
-                return heroes.set(i, new HeroWrapper(hero)) != null && saveUserHeroesToDisk() ? i : null;
+            if (hospitalHeroes.get(i) == null) {
+                System.out.println("Adding to HeroWrapper: " + (hospitalHeroes.set(i, new HeroWrapper(hero)) != null));
+                System.out.println("Saving all users: " + saveUserHeroesToDisk());
+                return i;
+            }
 
         System.out.println("No free medication available.");
         return null;
@@ -51,9 +66,13 @@ public class HospitalMerchant {
 
     private HeroWrapper getHeroWrapper(int i) {
         if (i >= 0 && i < maxHeroes)
-            return heroes.get(i);
+            return hospitalHeroes.get(i);
 
         throw new IllegalArgumentException("HospitalMerchant : getHeroWrapper() : Provided index is out of bounds.");
+    }
+
+    public ArrayList<Hero> getHeroesInMedication() {
+        return hospitalHeroes.stream().filter(Objects::nonNull).map(HeroWrapper::getHero).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public long getTimeToHealInMillis(int index) {
@@ -68,9 +87,9 @@ public class HospitalMerchant {
         if (index < 0 && index >= maxHeroes)
             throw new IllegalArgumentException("HospitalMerchant : instantHealHeroByIndex() : Provided index is out of bounds.");
 
-        int indexToOverride = userHeroes.indexOf(heroes.get(index).getHero());
+        int indexToOverride = userHeroes.indexOf(hospitalHeroes.get(index).getHero());
         userHeroes.get(indexToOverride).setInMedication(false);
-        heroes.set(index, null);
+        hospitalHeroes.set(index, null);
 
         return saveUserHeroesToDisk();
     }
@@ -79,9 +98,9 @@ public class HospitalMerchant {
         if (index < 0 && index >= maxHeroes)
             throw new IllegalArgumentException("HospitalMerchant : abortMedication() : Provided index is out of bounds.");
 
-        int indexToOverride = userHeroes.indexOf(heroes.get(index).getHero());
+        int indexToOverride = userHeroes.indexOf(hospitalHeroes.get(index).getHero());
         userHeroes.get(indexToOverride).setInMedication(false);
-        return heroes.set(index, null) == null && saveUserHeroesToDisk();
+        return hospitalHeroes.set(index, null) == null && saveUserHeroesToDisk();
     }
 
     private boolean saveUserHeroesToDisk() {
@@ -92,8 +111,8 @@ public class HospitalMerchant {
     }
 
     private ArrayList<Hero> getFromDisk() {
-        if (dao == null || heroes == null)
-            throw new NullPointerException("AbstractMerchant : getFromDisk : DAO isn't allowed to be null.");
+        if (dao == null || hospitalHeroes == null)
+            throw new NullPointerException("AbstractMerchant : getFromDisk : DAO or hospitalHeroes aren't allowed to be null.");
 
         return dao.getAllElements(FileNames.USER_HEROES.name());
     }
@@ -115,7 +134,7 @@ public class HospitalMerchant {
         long calculateTimeToHealInMillis() {
 
             // One lost HP takes 5 minutes to heal.
-            return hero.getHp() * 5 * 60 * 1000;
+            return (hero.getHpTotal() - hero.getHp()) * 5 * 60 * 1000;
         }
 
         double calculateCostsToInstantHeal() {

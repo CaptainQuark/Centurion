@@ -1,16 +1,19 @@
 package playground;
 
 /**
+ * Unfinished generic type converter.
+ *
  * @author Thomas Schönmann
  * @version %I%
  */
 class Converter<T> {
-    Class<T> convertTo;
+    private Class<T> convertTo;
 
     public Converter(Class<T> convertTo){
         this.convertTo = convertTo;
     }
 
+    @SuppressWarnings("unchecked")
     public <V> T convert(V from){
 
         if(from instanceof String){
