@@ -2,13 +2,12 @@ package playground;
 
 import dao.SerialDAO;
 import enumerations.CombatStatus;
-import enumerations.HeroType;
 import enumerations.MonsterType;
-import factory.HeroFactory;
 import factory.MonsterFactory;
 import input.InputSimulator;
-import manager.CombatState;
 import manager.CombatStateManager;
+import manager.CreatureManager;
+import model.CombatState;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -22,19 +21,20 @@ public class CombatStateManagerSample implements Observer {
     public static void main(String...args){
 
         CombatState combatManager = new CombatState(new SerialDAO())
-                .setHero(HeroFactory.getInstance().produce(HeroType.DEBUG_HERO))
+                .setHero(CreatureManager.getInstance(new SerialDAO()).getHeroes().get(0))
                 .setMonster(MonsterFactory.getInstance().produce(MonsterType.DEBUG_MONSTER));
 
         InputSimulator input = new InputSimulator();
 
         // Set the initial state.
-        CombatStateManager combatStateManager = new CombatStateManager(combatManager, new SerialDAO());
+        //CombatStateManager combatStateManager = new CombatStateManager(combatManager, new SerialDAO());
 
-        // Tell the CombatState that someone (= StateManager) wants to observe him.
-        combatStateManager.peek().setStateManagerObserver(combatStateManager);
+        // Tell the latest (= current and only) CombatState that someone (= StateManager) wants to observe him.
+        CombatStateManager.getInstance(combatManager, new SerialDAO()).peek()
+                .setStateManagerObserver(CombatStateManager.getInstance(combatManager, new SerialDAO()));
 
         // Register CombatState as observer for inputs.
-        input.addObserver(combatStateManager.peek());
+        input.addObserver(CombatStateManager.getInstance(combatManager, new SerialDAO()).peek());
 
         // Simulate some throws by the user.
 
@@ -42,7 +42,7 @@ public class CombatStateManagerSample implements Observer {
         input.addThrow(160);
         System.out.println();
 
-        System.out.println("Number of states: " + combatStateManager.getNumOfStates());
+        System.out.println("Number of states: " + CombatStateManager.getInstance(combatManager, new SerialDAO()).getNumOfStates());
     }
 
     @Override

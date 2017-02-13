@@ -1,6 +1,7 @@
 package mapper;
 
 import enumerations.AbilityType;
+import enumerations.Biome;
 import enumerations.HeroType;
 import factory.AbilityFactory;
 import generator.HeroGenerator;
@@ -33,10 +34,7 @@ public class HeroTypeMapper extends AbstractMapper<Hero> {
         switch (types) {
 
             case DEBUG_HERO:
-                return (Hero) new Hero(g.getName(),
-                        g.getFaction("NOT_IMPLEMENTED", "Primary"),
-                        g.getFaction("NOT_IMPLEMENTED", "Secondary"),
-                        g.getHitpoints(), 20, g.getEvasion(), g.getPurchaseCosts())
+                return (Hero) g.spawn(Biome.Coast)
                         .addAbility(AbilityFactory.getInstance().produce(AbilityType.HEAL_HERO_AT_BEGINNING_IF_HP_IS_UNDER_100));
 
             default:

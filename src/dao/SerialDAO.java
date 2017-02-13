@@ -36,6 +36,7 @@ public class SerialDAO implements DAO {
                 fis.close();
                 return elements;
             } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
 

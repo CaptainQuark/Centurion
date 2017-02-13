@@ -1,15 +1,18 @@
 package generator;
 
+import enumerations.Biome;
 import enumerations.HeroValues;
 import helper.ODSFileHelper;
+import model.Hero;
 import org.jdom2.IllegalDataException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Defines <tt>Hero</tt>'s values in a given boundary.
+ * Defines {@code Hero}'s values in a given boundary.
  *
  * @author Thomas Schönmann
  * @version %I%
@@ -18,6 +21,7 @@ public class HeroGenerator {
 
     private int primaryIndex = -1;
     private int secondaryIndex = -1;
+    private int bonusNumber = -1;
     private ArrayList<HashMap<String, ArrayList<String>>> table;
 
     /**
@@ -33,25 +37,25 @@ public class HeroGenerator {
             columnTitles.add(HeroValues.values()[i].toString());
 
         // Check if those names are different from the ones in the file. If so, throw an exception.
-        if(!ODSFileHelper.doColumnTitlesExist(columnTitles, table))
-                throw new IllegalDataException("Table's column-titles are different from what they should be.");
+        if (!ODSFileHelper.doColumnTitlesExist(columnTitles, table))
+            throw new IllegalDataException("Table's column-titles are different from what they should be.");
 
         this.table = table;
     }
 
     /**
-     * Define a name.
+     * Define a name for the {@code Hero}.
      *
      * @return A selected name.
      */
-    public String getName() {
+    private String getName() {
         final String[] names = {"Gunther", "Gisbert", "Kamel", "Pepe", "Rudy", "Bow", "Joe",
                 "Wiesgart", "Knöllchen", "Speck-O", "Toni", "Brieselbert", "Heinmar",
                 "Beowulf", "Hartmut von Heinstein", "Konrad Käsebart", "Clayton Wiesel",
                 "Jimmy 'Die Bohne'", "Rob Cross", "Aleksandr Oreshkin", "Joe Cullen", "Brichard Bösel",
                 "Der Typ aus der Joghurt-Werbung"};
 
-        // Bound between 0 (inclusive) and 'names.size()' (exclusive).
+        // Bound between 0 (inclusive) and {@code names.size()} (exclusive).
         return names[new Random().nextInt(names.length)];
     }
 
@@ -60,7 +64,7 @@ public class HeroGenerator {
      *
      * @return A selected faction.
      */
-    public String getFaction(final String validBiome, final String category) {
+    private String getFaction(final Biome validBiome, final String category) {
         ArrayList<String> categories = ODSFileHelper.extractColumn(table, HeroValues.CATEGORY.name());
         ArrayList<Integer> rarities = ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.RARITY.name()));
         ArrayList<String> restrictedBiomes = ODSFileHelper.extractColumn(table, HeroValues.RESTRICTED_BIOME.name());
@@ -86,7 +90,7 @@ public class HeroGenerator {
 
         } while (!categories.get(index).equals(category)
                 || rarity != rarities.get(index)
-                || isBiomeSelectionInvalid(validBiome, ODSFileHelper.extractMultipleValuesInSingleCells(restrictedBiomes, ",").get(index)));
+                || isBiomeSelectionInvalid(validBiome.name(), ODSFileHelper.extractMultipleValuesInSingleCells(restrictedBiomes, ",").get(index)));
 
         switch (category) {
             case "Primary":
@@ -104,11 +108,11 @@ public class HeroGenerator {
     }
 
     /**
-     * Define the amount of hitpoints.
+     * Define the amount of {@code hpTotal}.
      *
-     * @return Integer of hitpoints.
+     * @return Integer of {@code hpTotal}.
      */
-    public int getHitpoints() {
+    private int getTotalHitPoints() {
         return generateRandomVal(
                 ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.HP.name())).get(primaryIndex),
                 ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.HP.name())).get(secondaryIndex),
@@ -117,11 +121,11 @@ public class HeroGenerator {
     }
 
     /**
-     * Define how high the costs to purchase are.
+     * Define how high the {@code purchaseCosts} are.
      *
-     * @return Amount of money it needs to buy a hero.
+     * @return Amount of currency it needs to create a {@code Hero}.
      */
-    public int getPurchaseCosts() {
+    private int getPurchaseCosts() {
         return generateRandomVal(
                 ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.COSTS.name())).get(primaryIndex),
                 ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.COSTS.name())).get(secondaryIndex),
@@ -130,11 +134,11 @@ public class HeroGenerator {
     }
 
     /**
-     * Define the hero's evasion.
+     * Define the {@code Hero}'s {@code evasion}.
      *
-     * @return Integer representing the evasion value.
+     * @return Integer representing the {@code evasion}.
      */
-    public int getEvasion() {
+    private int getEvasion() {
         return generateRandomVal(
                 ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.EVASION.name())).get(primaryIndex),
                 ODSFileHelper.castToInteger(ODSFileHelper.extractColumn(table, HeroValues.EVASION.name())).get(secondaryIndex),
@@ -195,5 +199,41 @@ public class HeroGenerator {
             return valMaxQuartile;
 
         return random.nextInt(valMaxQuartile - valMinQuartile) + valMinQuartile;
+    }
+
+    /**
+     * Let the caller set a specific {@code bonusNumber} for the {@code Hero}.
+     *
+     * @param number The {@code bonusNumber} to set.
+     * @return {@code HeroGenerator}-reference to enable builder.
+     */
+    public HeroGenerator setBonusNumber(int number) {
+        if (number <= 0 || number > 180)
+            throw new IllegalArgumentException("MonsterGenerator : setBonusNumber() : Given number is out of bounds.");
+
+        this.bonusNumber = number;
+        return this;
+    }
+
+    /**
+     * If no specific {@code bonusNumber} was set, create one randomly within the game's bounds.
+     *
+     * @return {@code Integer} within the game's points-bounds.
+     */
+    private int generateBonusNumber() {
+
+        // 'origin' is inclusive, 'bound' exclusive.
+        return ThreadLocalRandom.current().nextInt(1, 180 + 1);
+    }
+
+    public Hero spawn(final Biome biome) {
+        return new Hero(
+                getName(),
+                getFaction(biome, "Primary"),
+                getFaction(biome, "Secondary"),
+                getTotalHitPoints(),
+                bonusNumber != -1 ? bonusNumber : generateBonusNumber(),
+                getEvasion(),
+                getPurchaseCosts());
     }
 }

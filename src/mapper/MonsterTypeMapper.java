@@ -1,11 +1,14 @@
 package mapper;
 
-import enumerations.*;
+import enumerations.AbilityType;
+import enumerations.Biome;
+import enumerations.MonsterDifficulty;
+import enumerations.MonsterType;
+import factory.AbilityFactory;
 import generator.MonsterGenerator;
 import helper.ODSFileHelper;
 import helper.Preference;
 import helper.StandardPathHelper;
-import manager.CombatState;
 import model.Monster;
 
 import java.io.File;
@@ -37,25 +40,8 @@ public class MonsterTypeMapper extends AbstractMapper<Monster> {
             case DEBUG_MONSTER:
                 g = new MonsterGenerator(table, Biome.Forest, MonsterDifficulty.Easy);
 
-                return (Monster) new Monster(g.getValAsString(MonsterValues.NAME),
-                        g.getValAsString(MonsterValues.TYPE),
-                        g.getValAsInt(MonsterValues.HP),
-                        25,
-                        g.getValAsInt(MonsterValues.EVASION),
-                        Biome.Forest,
-                        Checkout.DEFAULT, MonsterDifficulty.Medium,
-                        g.getValAsDouble(MonsterValues.RESISTANCE),
-                        g.getValAsDouble(MonsterValues.CRIT_MULITPLIER),
-                        g.getValAsInt(MonsterValues.DMG_MIN),
-                        g.getValAsInt(MonsterValues.DMG_MAX),
-                        g.getValAsInt(MonsterValues.BLOCK),
-                        g.getValAsInt(MonsterValues.CRIT_CHANCE),
-                        g.getValAsInt(MonsterValues.BOUNTY),
-                        g.getValAsInt(MonsterValues.ACCURACY))
-                        .addAbility((final CombatState c) -> {
-                            if (c.getLastNumberThrownByUser() > 100)
-                                System.out.println("More than a 100 has been thrown - what a mighty shot!");
-                        });
+                return (Monster) g.spawn()
+                        .addAbility(AbilityFactory.getInstance().produce(AbilityType.RESTORE_HP_IF_DAMAGE_WAS_TAKEN));
 
             default:
                 System.out.println("default @ switch @ map(...) @ MonsterTypeMapper called.");

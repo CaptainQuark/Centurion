@@ -19,10 +19,23 @@ public class AbilityMapper extends AbstractMapper<Ability> {
             case DEBUG:
                 return c -> System.out.println("DEBUG Ability working.");
 
+            case RESTORE_HP_IF_DAMAGE_WAS_TAKEN:
+                return c -> {
+                    if (c.getNumOfStates() > 1 && c.peek().getMonster().getHp() < c.look(c.getNumOfStates() - 1).getMonster().getHp()) {
+                        c.peek().getMonster().setHp(c.peek().getMonster().getHpTotal());
+                        System.out.println("Monster's health got restored.");
+                    } else {
+                        if (c.getNumOfStates() == 1 && c.peek().getMonster().getHp() < c.peek().getMonster().getHpTotal()) {
+                            c.peek().getMonster().setHp(c.peek().getMonster().getHpTotal());
+                            System.out.println("Monster's health got restored in first throw!.");
+                        }
+                    }
+                };
+
             case HEAL_HERO_AT_BEGINNING_IF_HP_IS_UNDER_100:
                 return c -> {
-                    if(c.getHero().getHp() < 100 && c.getStatus().equals(CombatStatus.BEFORE_FIRST_ROUND_OF_ABILITIES))
-                        c.getHero().setHp(c.getHero().getHpTotal());
+                    if (c.peek().getHero().getHp() < 100 && c.peek().getStatus().equals(CombatStatus.BEFORE_FIRST_ROUND_OF_ABILITIES))
+                        c.peek().getHero().setHp(c.peek().getHero().getHpTotal());
                 };
 
                 default:

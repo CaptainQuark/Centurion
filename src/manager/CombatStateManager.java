@@ -2,6 +2,7 @@ package manager;
 
 import dao.DAO;
 import enumerations.CombatStatus;
+import model.CombatState;
 import model.Item;
 
 import java.util.Observable;
@@ -15,8 +16,13 @@ import java.util.Observable;
 public class CombatStateManager extends StateManager<CombatState> {
 
     private static DAO dao;
+    private static CombatStateManager instance;
 
-    public CombatStateManager(CombatState t, DAO dao) {
+    public static CombatStateManager getInstance(CombatState t, DAO dao) {
+        return instance == null ? instance = new CombatStateManager(t, dao) : instance;
+    }
+
+    private CombatStateManager(CombatState t, DAO dao) {
         super(t);
         CombatStateManager.dao = dao;
     }

@@ -26,7 +26,7 @@ public class GenericPlayground {
         //demo2();
         //demoHeroEqual();
         //demoHeroMerchant();
-        demoItemMerchant();
+        //demoItemMerchant();
     }
 
     private static void demoItemMerchant() {

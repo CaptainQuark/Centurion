@@ -1,7 +1,7 @@
 package model;
 
 import generator.SequentialIDGenerator;
-import manager.CombatState;
+import manager.CombatStateManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -48,14 +48,14 @@ public abstract class AbstractCreature extends SequentialIDGenerator<AbstractCre
 
     @Override
     public void update(Observable o, Object arg) {
-        if(!(arg instanceof CombatState))
-            throw new IllegalArgumentException("No combat manager provided for creature.");
+        if (!(arg instanceof CombatStateManager))
+            throw new IllegalArgumentException("No CombatStateManager provided for creature.");
 
-        System.out.println(name + "'s update with CombatState as arg called.");
+        //System.out.println(name + "'s update with CombatState as arg called.");
 
         // Delegate the CombatManger-object to every own action
         //  so they can operate with it.
-        abilities.forEach(a -> a.ability((CombatState) arg));
+        abilities.forEach(a -> a.ability((CombatStateManager) arg));
     }
 
     /*
@@ -88,7 +88,7 @@ public abstract class AbstractCreature extends SequentialIDGenerator<AbstractCre
             return this;
         }
 
-        throw new IllegalArgumentException("No combat manager provided for creature.");
+        throw new IllegalArgumentException("HP value out of range.");
     }
 
     public int getEvasion() {

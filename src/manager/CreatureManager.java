@@ -1,6 +1,7 @@
 package manager;
 
 import dao.DAO;
+import enumerations.FileNames;
 import model.Hero;
 import model.Monster;
 import org.jetbrains.annotations.Nullable;
@@ -33,17 +34,25 @@ public class CreatureManager {
     }
 
     public boolean addHero(Hero h){
-        return heroes.add(h) && dao.saveList(Hero.class, heroes);
+        return heroes.add(h) && dao.saveList(FileNames.USER_HEROES.name(), heroes);
     }
 
+    /*
+     * TODO Not useful right now. Either change to retrieve object from Factory or delete at whole.
+     */
+    @Deprecated
     public boolean addMonster(Monster m){
-        return monsters.add(m) && dao.saveList(Monster.class, monsters);
+        return monsters.add(m) && dao.saveList(FileNames.MONSTERS.name(), monsters);
     }
 
+    // TODO Removing won't work due to new way of saving by file-name.
+    @Deprecated
     public boolean removeHero(Hero h){
         return dao.removeElement(h) && heroes.remove(h);
     }
 
+    // TODO Removing won't work due to new way of saving by file-name.
+    @Deprecated
     public boolean removeMonster(Monster m){
         return dao.removeElement(m) && monsters.remove(m);
     }
@@ -58,15 +67,15 @@ public class CreatureManager {
 
     @Nullable
     private static ArrayList<Hero> retrieveAllHeros() {
-        return dao.getAllElements(Hero.class) != null
-                ? dao.getAllElements(Hero.class).stream().filter(c -> c instanceof Hero).map(c -> (Hero) c).collect(Collectors.toCollection(ArrayList::new))
+        return dao.<Hero>getAllElements(FileNames.USER_HEROES.name()) != null
+                ? dao.<Hero>getAllElements(FileNames.USER_HEROES.name()).stream().filter(c -> c instanceof Hero).map(c -> c).collect(Collectors.toCollection(ArrayList::new))
                 : null;
     }
 
     @Nullable
     private static ArrayList<Monster> retrieveAllMonsters() {
-        return dao.getAllElements(Monster.class) != null
-                ? dao.getAllElements(Monster.class).stream().filter(c -> c instanceof Monster).map(c -> (Monster) c).collect(Collectors.toCollection(ArrayList::new))
+        return dao.<Monster>getAllElements(FileNames.MONSTERS.name()) != null
+                ? dao.<Monster>getAllElements(FileNames.MONSTERS.name()).stream().filter(c -> c instanceof Monster).map(c -> c).collect(Collectors.toCollection(ArrayList::new))
                 : null;
     }
 }

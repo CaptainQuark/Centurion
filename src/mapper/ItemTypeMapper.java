@@ -33,8 +33,8 @@ public class ItemTypeMapper extends AbstractMapper<Item> {
 
                 return new Item("Debug Item",
                         c -> {
-                            if (c.getHero().getHp() < 50)
-                                c.getHero().setHp(c.getHero().getHp() + 50);
+                            if (c.peek().getHero().getHp() < 50)
+                                c.peek().getHero().setHp(c.peek().getHero().getHp() + 50);
                         },
                         1);
 

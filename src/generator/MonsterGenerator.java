@@ -1,14 +1,17 @@
 package generator;
 
 import enumerations.Biome;
+import enumerations.Checkout;
 import enumerations.MonsterDifficulty;
 import enumerations.MonsterValues;
 import helper.ODSFileHelper;
+import model.Monster;
 import org.jdom2.IllegalDataException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Thomas Schönmann
@@ -17,8 +20,8 @@ import java.util.Random;
 public class MonsterGenerator {
 
     private int index;
+    private int bonusNumber = -1;
     private final ArrayList<HashMap<String, ArrayList<String>>> table;
-    private final MonsterDifficulty newDifficulty;
 
     public MonsterGenerator(ArrayList<HashMap<String, ArrayList<String>>> table, Biome biome, MonsterDifficulty difficulty) {
         this.table = table;
@@ -35,7 +38,7 @@ public class MonsterGenerator {
                         seed <= 90 ? 2 : 3;
 
         // Update difficulty.
-        newDifficulty = calculateDifficulty(difficulty);
+        MonsterDifficulty newDifficulty = calculateDifficulty(difficulty);
 
         // Calculate index.
         int numEntries = ODSFileHelper.extractColumn(table, MonsterValues.NAME.name()).size();
@@ -82,15 +85,58 @@ public class MonsterGenerator {
             throw new IllegalDataException("Table's column-titles are different from what they should be.");
     }
 
-    public String getValAsString(MonsterValues v){
+    private String getValAsString(MonsterValues v){
         return ODSFileHelper.extractColumn(table,v.name()).get(index);
     }
 
-    public int getValAsInt(MonsterValues v){
+    private int getValAsInt(MonsterValues v){
         return Integer.parseInt(ODSFileHelper.extractColumn(table,v.name()).get(index));
     }
 
-    public double getValAsDouble(MonsterValues v){
+    private double getValAsDouble(MonsterValues v){
         return Double.parseDouble(ODSFileHelper.extractColumn(table,v.name()).get(index));
+    }
+
+    /**
+     * Let the caller set a specific {@code bonusNumber} for the {@code Monster}.
+     *
+     * @param number The {@code bonusNumber} to set.
+     * @return {@code MonsterGenerator}-reference to enable builder.
+     */
+    public MonsterGenerator setBonusNumber(int number) {
+        if (number <= 0 || number > 180)
+            throw new IllegalArgumentException("MonsterGenerator : setBonusNumber() : Given number is out of bounds.");
+
+        this.bonusNumber = number;
+        return this;
+    }
+
+    /**
+     * If no specific {@code bonusNumber} was set, create one randomly within the game's bounds.
+     *
+     * @return {@code Integer} within the game's bounds.
+     */
+    private int generateBonusNumber() {
+
+        // 'origin' is inclusive, 'bound' exclusive.
+        return ThreadLocalRandom.current().nextInt(1, 180 + 1);
+    }
+
+    public Monster spawn() {
+        return new Monster(getValAsString(MonsterValues.NAME),
+                getValAsString(MonsterValues.TYPE),
+                getValAsInt(MonsterValues.HP),
+                bonusNumber != -1 ? bonusNumber : generateBonusNumber(),
+                getValAsInt(MonsterValues.EVASION),
+                Biome.Forest,
+                Checkout.DEFAULT, MonsterDifficulty.Medium,
+                getValAsDouble(MonsterValues.RESISTANCE),
+                getValAsDouble(MonsterValues.CRIT_MULITPLIER),
+                getValAsInt(MonsterValues.DMG_MIN),
+                getValAsInt(MonsterValues.DMG_MAX),
+                getValAsInt(MonsterValues.BLOCK),
+                getValAsInt(MonsterValues.CRIT_CHANCE),
+                getValAsInt(MonsterValues.BOUNTY),
+                getValAsInt(MonsterValues.ACCURACY));
     }
 }

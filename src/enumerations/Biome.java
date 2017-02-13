@@ -5,5 +5,6 @@ package enumerations;
  * @version %I%
  */
 public enum Biome {
+    Coast,
     Forest,
 }
