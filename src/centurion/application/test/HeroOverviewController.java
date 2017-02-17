@@ -1,4 +1,4 @@
-package centurion.application.sample;
+package centurion.application.test;
 
 import centurion.model.model.Hero;
 import javafx.fxml.FXML;
@@ -49,8 +49,8 @@ public class HeroOverviewController {
     @FXML
     private void initialize() {
         // Initialize the person table with the two columns.
-        firstNameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
-        lastNameColumn.setCellValueFactory(cellData -> cellData.getValue().getHp());
+        //firstNameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
+        //lastNameColumn.setCellValueFactory(cellData -> cellData.getValue().getHp());
     }
 
     /**
@@ -62,6 +62,6 @@ public class HeroOverviewController {
         this.mainApp = mainApp;
 
         // Add observable list data to the table
-        personTable.setItems(mainApp.getPersonData());
+        //personTable.setItems(mainApp.getPersonData());
     }
 }

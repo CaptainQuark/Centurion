@@ -1,4 +1,4 @@
-package centurion.application.sample;
+package centurion.application.test;
 /**
  * @version %I%
  * @author Thomas Schönmann

@@ -24,6 +24,13 @@ public class CreatureManagerSample {
         CreatureManager.getInstance(dao).getHeroes().forEach(System.out::println);
     }
 
+    private static void createHeroes(){
+        ArrayList<Hero> heroes = new ArrayList<>();
+        for(int i = 0; i < 10; i++){
+
+        }
+    }
+
     private static void demoDAO() {
         DAO dao = new SerialDAO();
 

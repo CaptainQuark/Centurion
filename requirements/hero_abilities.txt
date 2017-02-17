@@ -1,0 +1,23 @@
+Allgemein:
+- Primärkl. und Sekundärkl. ermöglichen viele Variationen
+  Sekundärklassen haben Utiliy-Funktion mit umfangreicheren Fähigkeiten
+  Es ist während des Kampfes immer nur genau eine Klasse aktive (Klasse vergleichbar mit Zustand des Helden)
+  Eigene Abilitiy je Klasse
+  Klasse kann nur gewechselt werde, sobald Held nicht mehr in Wurfphase ist (= wenn alle 3 Pfeile in der Hand des Spielers sind)
+
+  Bonusfelder: Können entwender Single/Double/Triple oder bestimmte Zahl sein,
+        lösen bestimmte Effekte aus und dienen dem Nutzer als Anreiz, bestimmte Zahlen anzuvisieren
+	pro Klasse sollte es mind. eine, jedoch auch möglich mehrere geben
+	Bonu
+
+Beispiele:
+
+Primär:
+- Wenn in Bonusfeld, dann wird zu Wurf +10 gerechnet (kann zu Überwurf führen)
+- Pro Treffer in Bonsufeld -> Monster nimmt sofort 20 Schaden (ignoriert Rüstung des Monsters)
+- Wenn Bonusfeld -> Einmalig +10 Rüstung, wenn Monster nächstes Mal angreift
+
+Sekundär:
+- Wenn Bonusfeld -> Rüstung des Monsters wird für Dauer des Kampfes um x reduziert.
+- Wenn Bonusfeld -> Held kann nächste Runde nicht sterben und überlebt garantiert mit 1.
+- Wenn Bonusfeld -> Status wird wieder hergestellt
