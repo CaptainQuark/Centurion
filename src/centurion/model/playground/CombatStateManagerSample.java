@@ -8,6 +8,7 @@ import centurion.model.input.InputSimulator;
 import centurion.model.manager.CombatStateManager;
 import centurion.model.manager.CreatureManager;
 import centurion.model.model.CombatState;
+import centurion.model.model.ValidThrow;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -39,7 +40,7 @@ public class CombatStateManagerSample implements Observer {
         // Simulate some throws by the user.
 
         // Monster's ability should fire twice.
-        input.addThrow(160);
+        input.addThrow(new ValidThrow(20, ValidThrow.Multiplier.THREE));
         System.out.println();
 
         System.out.println("Number of states: " + CombatStateManager.getInstance(combatManager, new SerialDAO()).getNumOfStates());

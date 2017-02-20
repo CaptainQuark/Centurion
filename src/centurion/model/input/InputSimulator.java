@@ -1,5 +1,7 @@
 package centurion.model.input;
 
+import centurion.model.model.Throw;
+
 import java.util.Observable;
 
 /**
@@ -10,7 +12,7 @@ import java.util.Observable;
  */
 public class InputSimulator extends Observable {
 
-    public void addThrow(Integer i){
+    public void addThrow(Throw i){
         setChanged();
         notifyObservers(i);
     }

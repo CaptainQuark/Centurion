@@ -2,6 +2,7 @@ package centurion.model.model;
 
 import centurion.model.dao.DAO;
 import centurion.model.enumerations.CombatStatus;
+import centurion.model.generator.DamageGenerator;
 import centurion.model.manager.CombatStateManager;
 import centurion.model.manager.StateManager;
 
@@ -18,8 +19,8 @@ import java.util.Observer;
  */
 public final class CombatState extends Observable implements Observer, Cloneable, Serializable {
 
-    private int lastNumberThrownByUser;
-    private int lastNumberThrownByMonster;
+    private Throw lastNumberThrownByUser;
+    private int lastDamageCreatedByMonster;
     private Hero hero;
     private Monster monster;
     private static AllCreaturesProcessedTeller finishedTeller;
@@ -28,9 +29,35 @@ public final class CombatState extends Observable implements Observer, Cloneable
     private ArrayList<Item> itemsUsedInThisState;
     private static DAO dao;
     private static StateManager stateManager;
+    private static int throwCountCurrently;
+    private int throwCount;
 
-    // TODO Consider changing to take arguments (hero, monster).
+    /**
+     * Constructor to be called when first <code>CombatState</code> gets initialized.
+     *  Makes sure that <code>throwCountCurrently</code> get correctly initialized.
+     *
+     * @param dao                       DAO for file access.
+     * @param throwCountStartingPoint   Global count for number of user's throws registered.
+     */
+    public CombatState(DAO dao, int throwCountStartingPoint){
+        throwCountCurrently = throwCountStartingPoint;
+        initialize(dao);
+    }
+
+    /**
+     * Constructor used when duplicating the state.
+     *
+     * @param dao                       DAO for file access.
+     */
     public CombatState(DAO dao) {
+        initialize(dao);
+        throwCount = ++throwCountCurrently % 3;
+    }
+
+    /**
+     * Initializes some of the state's variables correctly.
+     */
+    private void initialize(DAO dao){
         CombatState.dao = dao;
         finishedTeller = new AllCreaturesProcessedTeller();
         status = CombatStatus.BEFORE_FIRST_ROUND_OF_ABILITIES;
@@ -38,6 +65,13 @@ public final class CombatState extends Observable implements Observer, Cloneable
         itemsUsedInThisState = new ArrayList<>();
     }
 
+    /**
+     * Makes an user's <code>Item</code> available for use in the combat. Depending on the
+     *  <code>Item</code> it will last for only the single state or more.
+     *
+     * @param item  The <code>Item</code> to use.
+     * @return      Result if activation of item was successful.
+     */
     @Deprecated
     public boolean useItem(Item item) {
         if (!itemsInStock.contains(item))
@@ -47,14 +81,28 @@ public final class CombatState extends Observable implements Observer, Cloneable
         return itemsUsedInThisState.add(item) && itemsInStock.remove(item);
     }
 
+    /**
+     * Retrieve all <code>Item</code>'s the use owns.
+     *
+     * @return The user's <code>Item</code>s.
+     */
     public ArrayList<Item> getItemsInStock() {
         return itemsInStock;
     }
 
+    /**
+     * Retrieve all <code>Item</code>'s the use currently uses.
+     *
+     * @return The user's <code>Item</code>s currently in use.
+     */
     public ArrayList<Item> getItemsUsedInThisState(){
         return itemsUsedInThisState;
     }
 
+    /**
+     * Process the used <code>Item</code>'s <code>Ability</code>s to make
+     *  them effectively operational.
+     */
     private void processUsedItemsAbilities(){
         itemsUsedInThisState.forEach(item -> item.getAbilities()
                 .forEach(ability -> ability
@@ -68,20 +116,38 @@ public final class CombatState extends Observable implements Observer, Cloneable
         itemsUsedInThisState.removeIf(item -> item.decrementThrowsCount() == 0);
     }
 
-    // Observer-method. Listens to centurion.model.input from user.
+    /**
+     * Observer-method. Listens to centurion.model.input from user.
+     */
     @Override
     public void update(Observable o, Object arg) {
         if (arg instanceof Integer) {
             System.out.println("The user has hit the field " + arg + ", Combat has been notified.");
 
             // Update 'lastNumberThrownByUser'.
-            this.setLastNumberThrownByUser((Integer) arg);
+            this.setLastNumberThrownByUser((Throw) arg);
 
             // Decrease the monster's hp.
-            this.monster.setHp(this.monster.getHp() - lastNumberThrownByUser);
+            if(lastNumberThrownByUser instanceof ValidThrow){
+                ValidThrow t = (ValidThrow) lastNumberThrownByUser;
+                this.monster.setHp(this.monster.getHp() - t.getScore());
+            }
         }
 
+        // Process hero's and monster's abilities + items.
         tellObservers();
+
+        if(throwCountCurrently == 0 && throwCount != 0){
+
+            // TODO Replace '0' used for bonus evasion with non-dummy.
+            hero.setHp(hero.getHpTotal() - DamageGenerator.calculateMonsterDamage(monster,hero, 0));
+        }
+
+        /*
+         * Tell every observer who wants to know when the combat
+         *  has finished.
+         */
+        finishedTeller.tell();
     }
 
     /**
@@ -110,25 +176,17 @@ public final class CombatState extends Observable implements Observer, Cloneable
         setChanged();
         notifyObservers(stateManager);
         processUsedItemsAbilities();
-
-        /*
-         * Tell every observer who wants to know when the combat
-         *  has finished.
-         */
-        finishedTeller.tell();
     }
 
+    @Deprecated
     public void deleteAllObservers() {
         this.deleteObservers();
     }
 
+    @Deprecated
     public void deleteSpecificObserver(Observer o) {
         this.deleteObserver(o);
     }
-
-    /*
-     * Getters and setters.
-     */
 
     public CombatState setHero(Hero h) {
         this.hero = h;
@@ -156,11 +214,11 @@ public final class CombatState extends Observable implements Observer, Cloneable
         return status;
     }
 
-    public int getLastNumberThrownByUser() {
+    public Throw getLastNumberThrownByUser() {
         return lastNumberThrownByUser;
     }
 
-    public void setLastNumberThrownByUser(int lastNumberThrownByUser) {
+    public void setLastNumberThrownByUser(Throw lastNumberThrownByUser) {
         this.lastNumberThrownByUser = lastNumberThrownByUser;
     }
 
@@ -172,12 +230,12 @@ public final class CombatState extends Observable implements Observer, Cloneable
         return monster;
     }
 
-    public int getLastNumberThrownByMonster() {
-        return lastNumberThrownByMonster;
+    public int getLastDamageCreatedByMonster() {
+        return lastDamageCreatedByMonster;
     }
 
-    public void setLastNumberThrownByMonster(int i) {
-        lastNumberThrownByMonster = i;
+    public void setLastDamageCreatedByMonster(int i) {
+        lastDamageCreatedByMonster = i;
     }
 
     @Override
@@ -185,10 +243,13 @@ public final class CombatState extends Observable implements Observer, Cloneable
         return super.clone();
     }
 
+    /**
+     * Helper to tell related observers that this combat state has reached its end,
+     *  meaning that every operation has been performed.
+     */
     public class AllCreaturesProcessedTeller extends Observable {
 
         private void tell() {
-
             removeDeadItems();
 
             // If a creature is down, set the status accordingly.
